@@ -1,0 +1,213 @@
+file,line,matched_terms,classification,reason
+AGENT.md,16,escrow | fake,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+AGENT.md,25,demo,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+AGENT.md,37,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+AGENT.md,39,example | placeholder,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+AGENT.md,43,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+AGENT.md,55,hardcoded,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+AGENT.md,63,Fake | demo | fake | placeholder,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+AGENT.md,73,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+app/actions/auth.ts,6,example,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/for-businesses/page.tsx,79,sample,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/for-businesses/page.tsx,83,sample,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/for-businesses/page.tsx,175,sample,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/for-businesses/page.tsx,179,sample,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/for-providers/page.tsx,96,sample,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/for-providers/page.tsx,101,sample,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/for-providers/page.tsx,207,Example,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/how-it-works/page.tsx,69,escrow,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/how-it-works/page.tsx,70,escrow,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/how-it-works/page.tsx,86,fake,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+app/j/[publicId]/page.tsx,23,example | sample,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/j/[publicId]/page.tsx,24,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/login/page.tsx,74,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+app/login/page.tsx,84,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+app/p/[username]/page.tsx,11,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,12,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,13,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,14,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,15,example | sample,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,17,Example | example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,18,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,21,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,23,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,24,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/page.tsx,13,example | sample,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/page.tsx,23,Example | example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/signup/page.tsx,80,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+app/signup/page.tsx,89,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+app/signup/page.tsx,99,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+app/signup/page.tsx,108,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+app/terms/page.tsx,35,escrow,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+ARCHITECTURE-ESSENTIALS.md,11,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+ARCHITECTURE-ESSENTIALS.md,12,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+ARCHITECTURE-ESSENTIALS.md,30,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+ARCHITECTURE.md,129,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+ARCHITECTURE.md,151,demo,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+ARCHITECTURE.md,195,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,31,Fake | escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,127,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,166,sample,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,178,placeholder,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,372,identity verified,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,453,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,482,fake,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,576,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,579,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,583,mock,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+BUILD-ROADMAP.md,642,escrow | fake,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+components/explore/career-atlas-view.tsx,99,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+components/explore/career-atlas-view.tsx,100,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+components/home/hero-3d-card.tsx,12,example,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+components/home/hero-search.tsx,50,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+components/home/hero-search.tsx,51,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+components/home/interactive-deal-simulator.tsx,9,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/home/interactive-deal-simulator.tsx,11,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/jobs/create-job-form.tsx,20,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+components/jobs/create-job-form.tsx,21,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+components/jobs/create-job-form.tsx,26,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+components/jobs/public-job-view.tsx,5,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/jobs/public-job-view.tsx,8,Example | example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/jobs/public-job-view.tsx,9,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/jobs/transaction-record.tsx,5,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/jobs/transaction-record.tsx,10,Example | example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/jobs/transaction-record.tsx,14,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/navigation/footer.tsx,4,Example | sample,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+components/opportunities/opportunity-list-view.tsx,4,SAMPLE,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/opportunities/opportunity-list-view.tsx,9,SAMPLE,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/opportunities/opportunity-list-view.tsx,10,Example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/opportunities/opportunity-list-view.tsx,11,placeholder,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/opportunities/opportunity-list-view.tsx,13,Example | example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+components/ui/input.tsx,51,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
+data/trustlink-dev.json,30,sample,DEMO-ONLY,Legacy local fixture; excluded from active repositories and source handoff.
+data/trustlink-dev.json,31,sample,DEMO-ONLY,Legacy local fixture; excluded from active repositories and source handoff.
+data/trustlink-dev.json,47,sample,DEMO-ONLY,Legacy local fixture; excluded from active repositories and source handoff.
+data/trustlink-dev.json,48,sample,DEMO-ONLY,Legacy local fixture; excluded from active repositories and source handoff.
+data/trustlink-dev.json,64,escrow,DEMO-ONLY,Legacy local fixture; excluded from active repositories and source handoff.
+data/trustlink-dev.json,75,sample,DEMO-ONLY,Legacy local fixture; excluded from active repositories and source handoff.
+data/trustlink-dev.json,76,sample,DEMO-ONLY,Legacy local fixture; excluded from active repositories and source handoff.
+docs/age-safety-audit.md,16,SAMPLE,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/age-safety-audit.md,20,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/age-safety-audit.md,31,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/age-safety-audit.md,66,sample,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/age-safety-audit.md,77,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/age-safety-audit.md,94,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/age-safety-audit.md,103,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/agent-start.md,13,example | fake,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/agent-start.md,15,fake,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/agent-start.md,31,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/competitive-positioning.md,26,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/competitive-positioning.md,37,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/competitive-positioning.md,38,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/competitive-positioning.md,40,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/competitive-positioning.md,98,sample,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/competitive-positioning.md,184,fake,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/competitive-positioning.md,185,fake,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/competitive-positioning.md,222,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/data-provenance-audit.md,17,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/data-provenance-audit.md,92,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/data-provenance-audit.md,93,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/data-provenance-audit.md,95,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/data-provenance-audit.md,97,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/data-provenance-audit.md,98,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/data-provenance-audit.md,107,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/data-provenance-audit.md,138,official,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/FINAL-INTEGRITY-AUDIT.md,30,base64,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/FINAL-INTEGRITY-AUDIT.md,62,Example | example | official,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/FINAL-INTEGRITY-AUDIT.md,63,verifiedRevenue,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/FINAL-INTEGRITY-AUDIT.md,74,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/FINAL-INTEGRITY-AUDIT.md,98,placeholder | sample,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/FINAL-INTEGRITY-AUDIT.md,115,official,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/FINAL-INTEGRITY-AUDIT.md,135,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/product-boundary-audit.md,40,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/product-boundary-audit.md,50,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/product-boundary-audit.md,58,In-memory,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/product-boundary-audit.md,70,hardcoded | sample,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/product-boundary-audit.md,96,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/product-boundary-audit.md,105,hardcoded | sample,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/product-boundary-audit.md,148,sample,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/product-boundary-audit.md,227,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,31,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,46,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,69,Stub | verified: true,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,81,In-memory,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,92,sample,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,96,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,98,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,108,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,109,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,110,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,111,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,112,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,113,STUB,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,115,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,127,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,159,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,187,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,260,hardcoded | sample,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,266,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,269,PLACEHOLDER,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/REALITY-AUDIT-v1.md,270,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/supabase-setup.md,3,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-provider-interview-script.md,14,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-provider-interview-script.md,70,mock,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,19,example,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,21,protected funds,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,29,Protected funds,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,87,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,123,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,124,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,137,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,139,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,188,Protected funds,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,202,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,215,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,231,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,353,protected funds,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,410,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,457,Protected funds,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,519,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,538,Protected funds,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+docs/trustlink-psp-interview-script-v2.md,544,protected funds,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+empty.md,1,placeholder,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+lib/examples.ts,3,sample,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+lib/notifications/index.ts,1,STUB,REPLACE,"Empty, unused notification module; later phase must define minimal real event-based behavior."
+lib/opportunities/index.ts,74,SAMPLE,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+lib/opportunities/index.ts,114,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+lib/utils.ts,13,Example,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+lib/utils.ts,25,Example,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."
+PRD.md,48,stub,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+PRD.md,88,Protected funds,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+PRODUCT-VISION.md,76,escrow,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
+tests/browser/public.spec.ts,4,setTimeout,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/public.spec.ts,7,sample,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/public.spec.ts,28,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/public.spec.ts,37,sample,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/public.spec.ts,39,base64 | example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/public.spec.ts,43,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/public.spec.ts,51,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/public.spec.ts,61,sample,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/workflow.spec.ts,14,setTimeout,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/workflow.spec.ts,16,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/workflow.spec.ts,32,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/workflow.spec.ts,36,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/workflow.spec.ts,37,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/browser/workflow.spec.ts,58,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/database.test.ts,27,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/database.test.ts,45,FAKE,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/domain.test.ts,9,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/domain.test.ts,45,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/domain.test.ts,46,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/domain.test.ts,47,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/domain.test.ts,67,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/domain.test.ts,69,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/evidence-reputation.test.ts,7,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/evidence-reputation.test.ts,8,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/evidence-reputation.test.ts,9,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/local-store.test.ts,8,sample,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/local-store.test.ts,14,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/local-store.test.ts,16,fake,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/support/supabase-fixture.mts,9,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/support/supabase-fixture.mts,10,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/support/supabase-fixture.mts,11,example,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."
+tests/support/supabase-fixture.mts,27,base64,DEV-ONLY,"Automated test fixture, assertions, synthetic identities or timeout configuration."

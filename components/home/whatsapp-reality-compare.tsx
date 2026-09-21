@@ -1,0 +1,6 @@
+export function ConversationToRecord() {
+  return <section className="section border-b border-surface-200 bg-white"><div className="shell">
+    <div className="grid lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-20"><div><p className="eyebrow">From conversation to record</p><h2 className="text-3xl sm:text-4xl mt-4 mb-5">Keep the chat.<br/>Make the agreement clear.</h2><p className="text-surface-600 leading-7">You found each other on WhatsApp, Instagram or through a referral. TrustLink gives the terms a place of their own.</p></div>
+    <div className="grid sm:grid-cols-2 gap-8 sm:gap-10"><div><h3 className="text-sm font-semibold pb-4 border-b mb-5">In the conversation</h3><div className="space-y-5 text-sm leading-7 text-surface-500"><p>“Five pages, including the contact page.”</p><p>“₦180k. Can we finish by the 18th?”</p><p>“Yes. Two rounds of changes included.”</p></div></div><div className="border-l-2 border-navy-900 pl-6"><h3 className="text-sm font-semibold mb-5">In the TrustLink record</h3><dl className="space-y-4 text-sm">{[["Scope","Five responsive pages"],["Fee","₦180,000"],["Deadline","18 October 2026"],["Revisions","Two rounds"]].map(([k,v])=><div key={k}><dt className="text-xs text-surface-500 mb-1">{k}</dt><dd>{v}</dd></div>)}</dl></div></div></div>
+  </div></section>;
+}

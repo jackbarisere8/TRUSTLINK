@@ -1,0 +1,38 @@
+# Environment & secrets — never commit these
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+build/
+
+# Supabase local
+.supabase/
+
+# Misc
+.DS_Store
+*.log
+coverage/
+test-results/
+workflow-test-results/
+playwright-report/
+*.tsbuildinfo
+data/trustlink-local-v3.json*
+
+# Source exports and historical snapshots are not canonical source.
+/artifacts/
+*.zip
+/data/trustlink-dev.json
+
+# Only the blank configuration template belongs in a source handoff.
+.env.*
+!.env.example
