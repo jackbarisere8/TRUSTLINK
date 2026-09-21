@@ -1,4 +1,5 @@
-# Export canonical source only. No credentials, local records or generated files.
+# Export canonical source only. No credentials, local records or generated build/test output.
+# The checked-in database.generated.ts schema contract is canonical source.
 [CmdletBinding()]
 param()
 

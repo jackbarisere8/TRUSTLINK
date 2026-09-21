@@ -1,8 +1,58 @@
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { JobAggregate } from "../../db/repository";
-import type { JobRecord } from "../../db/types";
+import { participantDetailStatuses, type JobRecord, type ParticipantDetailStatus } from "../../db/types";
 import { DomainError } from "../errors";
 export type Actor = { id: string; type: "PROVIDER" | "CLIENT_PARTICIPANT" | "ADMIN"; name: string };
+
+export type TransactionParticipant = {
+  participantType: "PROVIDER" | "CLIENT_PARTICIPANT";
+  actorId: string;
+  accountAssociation: "ACCOUNT" | "GUEST";
+  accountUserId?: string;
+  displayName: string;
+  email?: string;
+  phone?: string;
+  detailStatus: ParticipantDetailStatus;
+};
+
+function isParticipantDetailStatus(value: unknown): value is ParticipantDetailStatus {
+  return typeof value === "string" && participantDetailStatuses.some(status => status === value);
+}
+
+export function clientParticipantDetailStatus(a: JobAggregate): ParticipantDetailStatus {
+  if (!a.job.clientTokenUsed) return "UNKNOWN";
+  const acceptance = [...a.events].reverse().find(event => event.eventType === "JOB_ACCEPTED");
+  const value = acceptance?.metadata.participantDetailStatus ?? acceptance?.metadata.identityStatus;
+  return isParticipantDetailStatus(value) ? value : "UNKNOWN";
+}
+
+export function transactionParticipants(
+  a: JobAggregate,
+  provider: { displayName: string; detailStatus: ParticipantDetailStatus },
+): TransactionParticipant[] {
+  const clientAccountId = a.job.clientId;
+  return [
+    {
+      participantType: "PROVIDER",
+      actorId: a.job.providerId,
+      accountAssociation: "ACCOUNT",
+      accountUserId: a.job.providerId,
+      displayName: provider.displayName,
+      detailStatus: provider.detailStatus,
+    },
+    {
+      participantType: "CLIENT_PARTICIPANT",
+      actorId: `client:${a.job.id}`,
+      accountAssociation: clientAccountId ? "ACCOUNT" : "GUEST",
+      ...(clientAccountId ? { accountUserId: clientAccountId } : {}),
+      displayName: a.job.clientName || "Invited client",
+      ...(a.job.clientEmail ? { email: a.job.clientEmail } : {}),
+      ...(a.job.clientPhone ? { phone: a.job.clientPhone } : {}),
+      detailStatus: clientParticipantDetailStatus(a),
+    },
+  ];
+}
+
 export const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
 export const newToken = () => randomBytes(32).toString("hex");
 export function validCapability(job: JobRecord, token: string, now = Date.now()) {

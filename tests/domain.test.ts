@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createAggregate, validCapability, publicEvents, type Actor } from "../lib/domain/jobs";
+import { createAggregate, validCapability, publicEvents, transactionParticipants, clientParticipantDetailStatus, type Actor } from "../lib/domain/jobs";
 import { acceptAggregate, transition } from "./support/lifecycle";
 import { commandSchema, createJobSchema } from "../lib/validation/schemas";
+import { aggregateSchema } from "../lib/db/local-schema";
 import { RecordedPaymentAdapter } from "../lib/payments";
 import type { CreateJobInput } from "../lib/db/types";
 const provider: Actor={id:"11111111-1111-4111-8111-111111111111",type:"PROVIDER",name:"Provider"};
@@ -51,6 +52,32 @@ test("capabilities expire, rotate, and validate before replay; acceptance cannot
  const rotated=transition(a,provider,{type:"ROTATE_INVITE"});
  assert.equal(validCapability(rotated.aggregate.job,token),false);
  assert.equal(validCapability(rotated.aggregate.job,rotated.token!),true);
+});
+test("transaction participants separate account profiles from guest client details",()=>{
+ const {aggregate,token}=createAggregate(input);
+ let participants=transactionParticipants(aggregate,{displayName:"Provider",detailStatus:"SELF_PROVIDED"});
+ assert.deepEqual(participants.map(participant=>({type:participant.participantType,association:participant.accountAssociation,status:participant.detailStatus})),[
+  {type:"PROVIDER",association:"ACCOUNT",status:"SELF_PROVIDED"},
+  {type:"CLIENT_PARTICIPANT",association:"GUEST",status:"UNKNOWN"},
+ ]);
+ const accepted=acceptAggregate(aggregate,token,{name:"Guest client",email:"guest@example.com",phone:"+2348012345678"});
+ participants=transactionParticipants(accepted,{displayName:"Provider",detailStatus:"SELF_PROVIDED"});
+ const guest=participants[1];
+ assert.equal(guest.accountUserId,undefined);
+ assert.equal(guest.displayName,"Guest client");
+ assert.equal(guest.email,"guest@example.com");
+ assert.equal(guest.phone,"+2348012345678");
+ assert.equal(guest.detailStatus,"SELF_PROVIDED");
+ assert.equal(clientParticipantDetailStatus(accepted),"SELF_PROVIDED");
+ const acceptance=accepted.events.find(event=>event.eventType==="JOB_ACCEPTED")!;
+ assert.equal(acceptance.metadata.participantDetailStatus,"SELF_PROVIDED");
+ assert.equal(acceptance.metadata.identityStatus,undefined);
+ assert.equal(aggregateSchema.safeParse(accepted).success,true);
+ const unsupported=structuredClone(accepted);unsupported.events.find(event=>event.eventType==="JOB_ACCEPTED")!.metadata.participantDetailStatus="VERIFIED_IDENTITY";
+ assert.equal(clientParticipantDetailStatus(unsupported),"UNKNOWN");
+ assert.equal(aggregateSchema.safeParse(unsupported).success,false);
+ const linked=structuredClone(accepted);linked.job.clientId="client-account";
+ assert.equal(transactionParticipants(linked,{displayName:"Provider",detailStatus:"SELF_PROVIDED"})[1].accountAssociation,"ACCOUNT");
 });
 test("revision cap and disputes preserve state; admin resolution has explicit outcome",()=>{
  let {a}=accepted();const c=client(a.job.id);

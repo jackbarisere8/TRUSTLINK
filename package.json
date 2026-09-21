@@ -6,7 +6,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "db:types": "node --import tsx scripts/generate-database-types.mts",
+    "db:types:check": "node --import tsx scripts/generate-database-types.mts --check",
+    "typecheck": "npm run db:types:check && tsc --noEmit",
     "test": "node --conditions=react-server --import tsx --test tests/*.test.ts",
     "test:browser": "playwright test",
     "test:workflow": "playwright test --config=playwright.workflow.config.ts"

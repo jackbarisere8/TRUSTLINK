@@ -60,3 +60,5 @@ The added tests use temporary directories and clearly synthetic test profiles. T
 ## Remaining boundaries
 
 Hosted Auth, PostgREST, RLS and Storage behavior has not been validated against a real Supabase project. Browser workflow evidence uses the existing test-only HTTP fixture backed by PGlite. No schema migration, payment processing, protected funds, new lifecycle states or broad UI redesign is part of Phase 2. The frozen pilot screens retain their existing behavior. The IDE Problems panel was not accessible; strict compiler/linter results describe the source checks actually run.
+
+Phase 3 subsequently centralized the lifecycle policy and added versioned acceptance. See `docs/PHASE-3-CANONICAL-STATE-MACHINE.md`; the Phase 2 results above remain the historical verification at that checkpoint.

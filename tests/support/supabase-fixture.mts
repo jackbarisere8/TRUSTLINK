@@ -4,11 +4,16 @@ import http from "node:http";
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
+if (process.env.TRUSTLINK_TEST_FIXTURE !== "1" || process.env.NODE_ENV === "production") {
+ throw new Error("DEV ONLY: set TRUSTLINK_TEST_FIXTURE=1 in a non-production automated test process.");
+}
 const pg=new PGlite();
-const users=[
+type FixtureUser={id:string;email:string;name:string;role:"PROVIDER"|"ADMIN";userMetadataRole?:string};
+const users:FixtureUser[]=[
  {id:"11111111-1111-4111-8111-111111111111",email:"provider@example.test",name:"Ada Provider",role:"PROVIDER"},
  {id:"22222222-2222-4222-8222-222222222222",email:"other@example.test",name:"Other Provider",role:"PROVIDER"},
  {id:"33333333-3333-4333-8333-333333333333",email:"admin@example.test",name:"Test Admin",role:"ADMIN"},
+ {id:"44444444-4444-4444-8444-444444444444",email:"metadata-admin@example.test",name:"Metadata Spoof",role:"PROVIDER",userMetadataRole:"ADMIN"},
 ];
 const sessions=new Map<string,typeof users[number]>();
 const files=new Map<string,Buffer>();
@@ -21,16 +26,17 @@ CREATE FUNCTION public.uuid_generate_v4() RETURNS uuid LANGUAGE sql AS 'SELECT g
 await pg.exec((await readFile("supabase/migrations/20260917000000_v0_core.sql","utf8")).replace('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',""));
 await pg.exec(await readFile("supabase/migrations/20260920000000_integrity.sql","utf8"));
  await pg.exec(await readFile("supabase/migrations/20260920000001_final_audit.sql","utf8"));
+ await pg.exec(await readFile("supabase/migrations/20260921000000_database_model.sql","utf8"));
 for(const u of users)await pg.query("INSERT INTO auth.users VALUES ($1,$2)",[u.id,{display_name:u.name}]);
-function authUser(u:typeof users[number]) {return {id:u.id,email:u.email,aud:"authenticated",role:"authenticated",app_metadata:{role:u.role},user_metadata:{display_name:u.name},created_at:new Date().toISOString()};}
-function session(u:typeof users[number]) {
+function authUser(u:FixtureUser) {return {id:u.id,email:u.email,aud:"authenticated",role:"authenticated",app_metadata:{role:u.role},user_metadata:{display_name:u.name,role:u.userMetadataRole},created_at:new Date().toISOString()};}
+function session(u:FixtureUser) {
  const encode=(v:unknown)=>Buffer.from(JSON.stringify(v)).toString("base64url");
  const now=Math.floor(Date.now()/1000);
  const token=encode({alg:"HS256",typ:"JWT"})+"."+encode({sub:u.id,exp:now+3600,iat:now,aud:"authenticated",role:"authenticated"})+".fixture-not-a-real-signature";
  sessions.set(token,u);
  return {access_token:token,refresh_token:"fixture-refresh-"+u.id,token_type:"bearer",expires_in:3600,expires_at:now+3600,user:authUser(u)};
 }
-const allowedTables=["profiles","provider_profiles","jobs","job_terms","payments","deliveries","revisions","disputes","reviews","trust_events","evidence_files"];
+const allowedTables=["profiles","provider_profiles","jobs","job_terms","job_participants","payments","deliveries","revisions","disputes","reviews","trust_events","evidence_files"];
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url!,"http://127.0.0.1:54329");
  const send=(status:number,data:unknown)=>{res.writeHead(status,{"Content-Type":"application/json"});res.end(JSON.stringify(data));};
@@ -93,4 +99,3 @@ const server=http.createServer(async(req,res)=>{
  }catch(error){const e=error as {message:string;code?:string};return send(400,{message:e.message,code:e.code});}
 });
 server.listen(54329,"127.0.0.1",()=>process.stdout.write("Test fixture ready on 54329\n"));
-

@@ -23,7 +23,7 @@ Creation publishes directly into `SENT` and writes `JOB_CREATED` and `JOB_SENT`.
 | Client capability | Review | COMPLETED | State unchanged / CLIENT_REVIEWED |
 | Provider | Rotate client link | Published, non-cancelled states | State unchanged / CLIENT_LINK_REISSUED |
 
-`JOB_VIEWED` is a label reserved for analytics, not a canonical state or an event written by page fetches. No payment-protection states are reachable. After the Phase 2 extraction, `lib/domain/transactions/state-machine.ts` owns transitions and `lib/domain/jobs.ts` only re-exports compatibility APIs; `lib/db/types.ts` owns the status union and UI imports it. See `PHASE-2-LOCAL-BACKEND.md` for subsequent changes and verification.
+`JOB_VIEWED` is a label reserved for analytics, not a canonical state or an event written by page fetches. No payment-protection states are reachable. After Phase 3, `lib/domain/transactions/policy.ts` declares the actor/state/action/event mappings and `state-machine.ts` enforces them; `lib/domain/jobs.ts` only re-exports compatibility APIs. The UI projects action visibility from the policy. See `PHASE-3-CANONICAL-STATE-MACHINE.md` for subsequent changes and verification.
 
 ### 1. Definitely implemented and verified at baseline
 
@@ -88,7 +88,7 @@ This section supersedes the baseline findings above; the baseline remains as the
 ### 1. Definitely implemented
 
 - The transition matrix above remains the actual lifecycle. Approval and completion are separate persisted steps. Database commits combine compare-and-swap version checking, row locking, child records and ledger appends; a commit without a new event rolls back.
-- Every transaction command requires a validated operation UUID and expected version at the Server Action boundary. A previously committed operation is a no-op, including a delivery replay after a revision cycle; reuse with a different payload or actor is rejected. Creation uses a stable creation UUID, and repeated acceptance cannot replace client identity. Concurrent conflicting submissions may return a refresh/retry error; they do not create duplicate state transitions.
+- Acceptance and every transaction command require a validated operation UUID and expected version at the Server Action boundary. A previously committed operation is a no-op, including a delivery replay after a revision cycle; reuse with a different payload, actor or reviewed version is rejected. Creation uses a stable creation UUID, and a fresh repeated acceptance cannot replace client identity. Concurrent conflicting submissions return a refresh/retry error; they do not create duplicate state transitions.
 - Ledger update/delete/truncate protection, request-ID uniqueness, supported event types and job association checks are enforced in PostgreSQL. Actor identity and event timestamps are assigned by server code. Event metadata is immutable. The event count is read under the job lock.
 - Anonymous/authenticated database roles have no direct private table/view/RPC access. All eleven application tables are covered by denial tests. App authorization uses Supabase-validated sessions or the transaction capability before returning private projections. A restrictive Storage policy also defeats unrelated permissive legacy policies for the evidence bucket.
 - Client capabilities expire, rotate and remain scoped to one transaction. Production cookies are HTTP-only, Secure and SameSite=Lax. No browser-submitted provider/admin/client identity controls authorization. Next Server Actions enforce origin checks; upload POST compares the browser Origin to the external Host using the request protocol, avoiding Next's internal-host mismatch.
@@ -153,3 +153,19 @@ Verified locally on 21 September 2026:
 Browser verification discovered and drove two actual fixes: uploads rejected a valid external origin because Next used an internal URL hostname, and an already-open transaction ignored a replacement invite fragment. Both pass in the final production workflow. Test-only failures from shared artifact directories, navigation timing, required-label matching and loopback API cookie behavior were corrected without weakening authorization assertions. Public route checks now explicitly reject 404 responses.
 
 The local source audit and targeted repairs are complete. Hosted deployment validation, historical data validation and operational evidence retention/abuse controls remain as stated above. No new product features or further broad visual redesign were added.
+
+## Subsequent Phase 3 verification — 21 September 2026
+
+`docs/PHASE-3-CANONICAL-STATE-MACHINE.md` supersedes the lifecycle implementation details and test counts above. Phase 3 moved actor/state/action/event declarations into one policy consumed by the engine and UI, added versioned acceptance, required runtime-validated operation requests in the engine, and rechecked client capabilities on the service's fresh read. The final checks passed: strict typecheck, lint, production build, 25 Node tests, 6 public browser tests and 1 full workflow browser test. The hosted-Supabase limitations stated above remain unchanged.
+
+## Subsequent Phase 4 verification — 21 September 2026
+
+`docs/PHASE-4-AUTHENTICATION-ARCHITECTURE.md` supersedes the authentication implementation details and test counts above. Phase 4 added a Supabase-only account-auth provider boundary, an explicit unauthenticated local provider, bounded shared auth schemas, linked-profile session resolution, trusted `app_metadata` role mapping and a gated automated fixture. Final checks passed: strict typecheck, lint, production build, 29 Node tests, 6 public browser tests and 2 workflow browser tests. Hosted email, expiry/refresh and deployment-proxy behavior remain staging requirements.
+
+## Subsequent Phase 5 verification — 21 September 2026
+
+`docs/PHASE-5-USER-PROFILE-PARTICIPANTS.md` supersedes the user/profile/participant implementation details and test counts above. Phase 5 separated Auth identity, application profile, provider profile and transaction participant types; added account/guest participant association; persisted accepted client provenance as `SELF_PROVIDED`; and exposed client details only in authorized participant workspaces. Public agreement projections still exclude the participant section and client contact details. Final checks passed: strict typecheck, lint, production build, 30 Node tests, 6 public browser tests and 2 workflow browser tests. The relational `job_participants` schema remains Phase 6 work, and hosted Supabase remains unverified.
+
+## Subsequent Phase 6 verification — 21 September 2026
+
+`docs/PHASE-6-DATABASE-MODEL.md` supersedes the physical-schema and migration-count details above. Phase 6 added canonical `job_participants`, backfilled historical provider/client rows, removed participant contact/capability columns from `jobs`, converted fee/deadline to native PostgreSQL types, removed manual reputation counters, strengthened relational constraints/indexes, and retained single trust-event/evidence stores instead of adding duplicate or speculative tables. The private RPC projection preserves the domain aggregate. Database types are generated from all four migrations and checked before TypeScript; the Supabase service client uses that generated contract. Final checks passed: schema drift check, strict typecheck, lint, production build, 31 Node tests, 6 public browser tests and 2 workflow browser tests. No migration was applied to hosted Supabase; historical target data and `NOT VALID` constraints still require staging review.

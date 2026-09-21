@@ -31,11 +31,13 @@ test("provider/client/admin workflow through Supabase adapter and real PostgreSQ
   await client.goto(invite);await client.getByRole("button",{name:"Review & accept terms"}).click();
   await client.getByLabel("Your name or organization").fill("Private Client Name");await client.getByLabel("Your email").fill("private-client@example.test");await client.getByRole("checkbox").check();await client.getByRole("button",{name:"Confirm acceptance"}).click();
   await expect(client.getByText("Accepted",{exact:true})).toBeVisible();
+  await expect(client.getByText("Guest participant",{exact:true})).toBeVisible();await expect(client.getByText("Self-provided contact details",{exact:true})).toBeVisible();
   const outsiderContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});const outsider=await outsiderContext.newPage();
   await outsider.goto(publicPath);await expect(outsider.getByRole("button",{name:/accept|approve|record payment/i})).toHaveCount(0);
-  expect(await outsider.content()).not.toContain("private-client@example.test");expect(await outsider.content()).not.toContain("clientActionTokenHash");
+  expect(await outsider.content()).not.toContain("private-client@example.test");expect(await outsider.content()).not.toContain("clientActionTokenHash");await expect(outsider.getByRole("heading",{name:"Participants",exact:true})).toHaveCount(0);
   await login(outsider,"other@example.test");await outsider.goto(workspace);await expect(outsider.getByRole("heading",{name:"Page not found.",exact:true})).toBeVisible();
-  await provider.reload();await provider.getByRole("button",{name:"Record payment",exact:true}).click();await confirm(provider);
+  await provider.goto("/dashboard/jobs");await expect(provider.getByText("Private Client Name",{exact:false})).toBeVisible();await provider.goto(workspace);
+  await provider.getByRole("button",{name:"Record payment",exact:true}).click();await confirm(provider);
   await provider.getByRole("button",{name:"Start work",exact:true}).click();await provider.getByRole("button",{name:"Submit delivery",exact:true}).click();
   await provider.getByLabel("Describe your delivery").fill("First website delivery");
   const upload=provider.waitForResponse(r=>r.url().includes("/api/evidence/")&&r.request().method()==="POST");
@@ -67,4 +69,29 @@ test("provider/client/admin workflow through Supabase adapter and real PostgreSQ
   await clientContext.addCookies([{...cookie,value:"0".repeat(64)}]);await client.reload();await expect(client.getByText("You are viewing the public agreement.",{exact:false})).toBeVisible();
   expect(errors).toEqual([]);
   await clientContext.close();await outsiderContext.close();await adminContext.close();
+});
+
+test("Supabase sessions enforce trusted roles, secure cookies and logout",async({browser})=>{
+  const rejectedContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});const rejected=await rejectedContext.newPage();
+  await rejected.goto("/login");await rejected.getByLabel("Email address").fill("provider@example.test");await rejected.getByLabel(/password/i).fill("wrong-password");await rejected.getByRole("button",{name:/log in/i}).click();
+  await expect(rejected.locator("main").getByRole("alert")).toContainText("couldn't sign you in");await expect(rejected).toHaveURL(/\/login$/);
+  const forgedContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});
+  await forgedContext.addCookies([{name:"tl_session_token",value:Buffer.from("forged:admin:ADMIN").toString("base64"),domain:"127.0.0.1",path:"/"}]);
+  const forged=await forgedContext.newPage();await forged.goto("/dashboard");await expect(forged).toHaveURL(/\/login$/);
+
+  const providerContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});const provider=await providerContext.newPage();
+  await login(provider,"provider@example.test");
+  const authCookies=(await providerContext.cookies()).filter(cookie=>cookie.name.startsWith("sb-"));
+  expect(authCookies.length).toBeGreaterThan(0);
+  for(const cookie of authCookies){expect(cookie.httpOnly).toBe(true);expect(cookie.secure).toBe(true);expect(cookie.sameSite).toBe("Lax");}
+  await provider.goto("/admin");await expect(provider.getByRole("heading",{name:"Page not found.",exact:true})).toBeVisible();
+  await provider.goto("/dashboard");await provider.getByRole("button",{name:"Sign out",exact:true}).click();await expect(provider).toHaveURL(/\/login$/);
+  await provider.goto("/dashboard");await expect(provider).toHaveURL(/\/login$/);
+
+  const metadataContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});const metadata=await metadataContext.newPage();
+  await login(metadata,"metadata-admin@example.test");await metadata.goto("/admin");await expect(metadata.getByRole("heading",{name:"Page not found.",exact:true})).toBeVisible();
+
+  const adminContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});const admin=await adminContext.newPage();
+  await login(admin,"admin@example.test");await admin.goto("/admin");await expect(admin.getByRole("heading",{name:"Administration",exact:true})).toBeVisible();
+  await rejectedContext.close();await forgedContext.close();await providerContext.close();await metadataContext.close();await adminContext.close();
 });

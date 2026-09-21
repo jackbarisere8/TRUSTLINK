@@ -1,16 +1,17 @@
 import { z } from "zod";
-import type { JobAggregate, ProfileData } from "./repository";
-import { jobStatuses } from "./types";
+import type { JobAggregate, ProfileBundle } from "./repository";
+import { jobStatuses, participantDetailStatuses } from "./types";
 import { sourceChannels } from "../validation/schemas";
 
 const text = z.string().min(1);
 const optionalText = z.string().optional();
 const timestamp = z.iso.datetime({ offset: true });
 const child = z.object({ id: text, jobId: text });
+const participantDetailStatusSet = new Set<string>(participantDetailStatuses);
 
-const profileSchema: z.ZodType<ProfileData> = z.object({
+const profileSchema: z.ZodType<ProfileBundle> = z.object({
   profile: z.object({ id: text, userId: text, username: text, displayName: text, avatarUrl: optionalText, country: text, state: optionalText, city: optionalText, createdAt: timestamp }),
-  providerProfile: z.object({ id: text, userId: text, headline: text, bio: optionalText, serviceArea: text, verificationStatus: z.enum(["UNVERIFIED", "IDENTITY_PROVIDED", "VERIFIED_BY_TRUSTLINK"]), completedJobsCount: z.number().int().nonnegative(), averageRating: z.number().nullable(), onTimeRate: z.number().nullable(), createdAt: timestamp }).nullable(),
+  providerProfile: z.object({ id: text, userId: text, headline: text, bio: optionalText, serviceArea: text, verificationStatus: z.enum(["UNVERIFIED", "IDENTITY_PROVIDED", "VERIFIED_BY_TRUSTLINK"]), createdAt: timestamp }).nullable(),
 });
 
 export const aggregateSchema: z.ZodType<JobAggregate> = z.object({
@@ -33,6 +34,16 @@ export const aggregateSchema: z.ZodType<JobAggregate> = z.object({
 }).superRefine((a, context) => {
   const fail = () => context.addIssue({ code: "custom", message: "Invalid aggregate relationships" });
   if (a.terms.jobId !== a.job.id || a.terms.revisionsUsed > a.terms.revisionsIncluded || Number(a.terms.price) <= 0) fail();
+  const acceptanceEvents = a.events.filter(event => event.eventType === "JOB_ACCEPTED");
+  const hasClientDetails = Boolean(a.job.clientId || a.job.clientName || a.job.clientEmail || a.job.clientPhone);
+  if ((a.job.clientTokenUsed ? acceptanceEvents.length !== 1 : acceptanceEvents.length !== 0) || (a.job.clientTokenUsed && (!a.job.clientName || !a.job.clientEmail)) || (!a.job.clientTokenUsed && hasClientDetails)) fail();
+  for (const acceptance of acceptanceEvents) {
+    const currentStatus = acceptance.metadata.participantDetailStatus;
+    const legacyStatus = acceptance.metadata.identityStatus;
+    if ((currentStatus !== undefined && (typeof currentStatus !== "string" || !participantDetailStatusSet.has(currentStatus))) ||
+        (legacyStatus !== undefined && (typeof legacyStatus !== "string" || !participantDetailStatusSet.has(legacyStatus))) ||
+        (currentStatus !== undefined && legacyStatus !== undefined && currentStatus !== legacyStatus)) fail();
+  }
   const requestIds = a.events.map(e => e.metadata.requestId).filter(id => id !== undefined);
   if (new Set(requestIds).size !== requestIds.length) fail();
   for (const collection of [a.payments, a.deliveries, a.revisions, a.disputes, a.reviews, a.events]) {

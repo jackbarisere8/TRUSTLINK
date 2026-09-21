@@ -1,10 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { resolveAuthConfiguration } from "@/lib/auth/config";
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL, key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (url && key && process.env.TRUSTLINK_STORAGE === "supabase") {
-    const client = createServerClient(url, key, {
+  const configuration = resolveAuthConfiguration(process.env);
+  if (configuration.mode === "supabase") {
+    const client = createServerClient(configuration.url, configuration.anonKey, {
       cookieOptions: { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" },
       cookies: { getAll: () => request.cookies.getAll(), setAll(values) {
         values.forEach(({ name,value }) => request.cookies.set(name,value));

@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPublicJobProjection, identifyActor } from "@/lib/jobs";
 import { db } from "@/lib/db";
-import { publicEvents } from "@/lib/domain/jobs";
+import { publicEvents, transactionParticipants } from "@/lib/domain/jobs";
 import { PublicJobView } from "@/components/jobs/public-job-view";
 import { ClientLink } from "@/components/jobs/client-link";
 import { Timeline } from "@/components/jobs/timeline";
 import { JobActions } from "@/components/jobs/job-actions";
 import { ParticipantEvidenceView } from "@/components/jobs/participant-evidence";
+import { TransactionParticipants } from "@/components/jobs/transaction-participants";
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{publicId:string}> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -28,6 +29,6 @@ export default async function Page({ params }: Props) {
   return <PublicJobView record={record}>
     <ClientLink publicId={publicId}/>
     <Timeline events={publicEvents(aggregate.events)}/>
-    {actor ? <><ParticipantEvidenceView data={{deliveries:aggregate.deliveries,revisions:aggregate.revisions,disputes:aggregate.disputes,reviews:aggregate.reviews}} jobId={aggregate.job.id}/><JobActions version={aggregate.job.version} jobId={aggregate.job.id} publicId={publicId} status={record.status} actor={actor.type} hasReview={!!aggregate.reviews.length}/></> : <p className="notice mt-8">You are viewing the public agreement. To accept or manage this transaction, open the private participant link shared by the provider.</p>}
+    {actor ? <><TransactionParticipants participants={transactionParticipants(aggregate, { displayName: record.provider.displayName, detailStatus: "SELF_PROVIDED" })}/><ParticipantEvidenceView data={{deliveries:aggregate.deliveries,revisions:aggregate.revisions,disputes:aggregate.disputes,reviews:aggregate.reviews}} jobId={aggregate.job.id}/><JobActions version={aggregate.job.version} jobId={aggregate.job.id} publicId={publicId} status={record.status} actor={actor.type} hasReview={!!aggregate.reviews.length}/></> : <p className="notice mt-8">You are viewing the public agreement. To accept or manage this transaction, open the private participant link shared by the provider.</p>}
   </PublicJobView>;
 }

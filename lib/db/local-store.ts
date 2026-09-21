@@ -2,11 +2,11 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import type { Repository, JobAggregate, ProfileData, ProfileInput } from "./repository";
+import type { Repository, JobAggregate, ProfileBundle, ProfileInput } from "./repository";
 import { ConflictError } from "../domain/errors";
 import { aggregateSchema, localDataSchema } from "./local-schema";
 import { isDeepStrictEqual } from "node:util";
-interface LocalData { profiles: ProfileData[]; records: JobAggregate[] }
+interface LocalData { profiles: ProfileBundle[]; records: JobAggregate[] }
 export class LocalStoreRepository implements Repository {
   constructor(private filename = path.join(process.cwd(), "data", "trustlink-local-v3.json")) {}
   private read(): LocalData {

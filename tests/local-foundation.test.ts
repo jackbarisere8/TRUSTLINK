@@ -111,7 +111,7 @@ test("domain service persists a full local lifecycle, profile changes, retries a
   // Test-only records exercise the repository; they do not provide an application login.
   await writeFile(file, JSON.stringify({ records: [], profiles: [{
     profile: { id: randomUUID(), userId: provider.id, username: "test-provider", displayName: "Test provider", country: "Nigeria", state: "Lagos", city: "Ikeja", createdAt: now },
-    providerProfile: { id: randomUUID(), userId: provider.id, headline: "Designer", serviceArea: "Remote", verificationStatus: "UNVERIFIED", completedJobsCount: 0, averageRating: null, onTimeRate: null, createdAt: now },
+    providerProfile: { id: randomUUID(), userId: provider.id, headline: "Designer", serviceArea: "Remote", verificationStatus: "UNVERIFIED", createdAt: now },
   }] }));
   const created = await service().create(provider, creation);
   assert.ok(created.token);

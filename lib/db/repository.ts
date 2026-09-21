@@ -1,4 +1,4 @@
-import type { ProfileRecord, ProviderProfileRecord, JobRecord, JobTermsRecord, PaymentRecord, DeliveryRecord, RevisionRecord, DisputeRecord, ReviewRecord, TrustEventRecord } from "./types";
+import type { ApplicationProfileRecord, ProviderProfileRecord, JobSummaryRecord, JobRecord, JobTermsRecord, PaymentRecord, DeliveryRecord, RevisionRecord, DisputeRecord, ReviewRecord, TrustEventRecord } from "./types";
 
 export interface JobAggregate {
   job: JobRecord;
@@ -10,15 +10,15 @@ export interface JobAggregate {
   reviews: ReviewRecord[];
   events: TrustEventRecord[];
 }
-export type ProfileData = { profile: ProfileRecord; providerProfile: ProviderProfileRecord | null };
+export type ProfileBundle = { profile: ApplicationProfileRecord; providerProfile: ProviderProfileRecord | null };
 export type ProfileInput = { displayName: string; country: string; state: string; city: string; headline: string; bio: string; serviceArea: string };
 export interface Repository {
-  getProfileByUsername(username: string): Promise<ProfileData | null>;
-  getProfileByUserId(userId: string): Promise<ProfileRecord | null>;
+  getProfileByUsername(username: string): Promise<ProfileBundle | null>;
+  getProfileByUserId(userId: string): Promise<ApplicationProfileRecord | null>;
   updateProfile(userId: string, input: ProfileInput): Promise<void>;
   getAggregate(id: string, byPublicId?: boolean): Promise<JobAggregate | null>;
-  listJobs(providerId?: string): Promise<JobRecord[]>;
-  listProfiles(): Promise<ProfileRecord[]>;
+  listJobs(providerId?: string): Promise<JobSummaryRecord[]>;
+  listProfiles(): Promise<ApplicationProfileRecord[]>;
   listDisputes(): Promise<DisputeRecord[]>;
   listEvents(): Promise<TrustEventRecord[]>;
   /** Atomic compare-and-swap. A conflict must leave both state and events unchanged. */

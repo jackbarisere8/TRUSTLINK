@@ -27,9 +27,15 @@ SENT → CANCELLED (provider)
 
 Creation publishes directly into SENT. DRAFT is reserved; JOB_VIEWED is an unused analytics label. The exact authorization/transition matrix is in `docs/FINAL-INTEGRITY-AUDIT.md`.
 
-**Implemented tables:** Supabase `auth.users`; public `profiles`, `provider_profiles`, `jobs`, `job_terms`, `payments`, `deliveries`, `revisions`, `disputes`, `reviews`, `trust_events`, `evidence_files`. No wallet/escrow tables. Apply all three migrations in order; the original migration alone is not the deployed authorization model.
+`lib/domain/transactions/policy.ts` is authoritative for actor/state/action/event mappings. `state-machine.ts` enforces it; UI controls only project it. All mutations require an operation UUID and reviewed version. `JOB_VIEWED` is never emitted by a page read and does not prove human review.
+
+**Implemented tables:** Supabase `auth.users`; public `profiles`, `provider_profiles`, `jobs`, `job_participants`, `job_terms`, `payments`, `deliveries`, `revisions`, `disputes`, `reviews`, `trust_events`, `evidence_files`. There are no duplicate job/payment event tables, speculative notification/analytics/audit tables, or wallet/escrow tables. Apply all four migrations in order; the original migration alone is not the deployed model. Generate the typed persistence contract with `npm run db:types`; `npm run typecheck` checks it for migration drift.
 
 **Core routes:** `/` `/j/[publicId]` (public, highest priority) `/p/[username]` (public) `/dashboard/*` `/disputes/[id]` `/admin/*`.
+
+**Authentication:** Supabase Auth is the only production provider. Local mode is explicitly unconfigured and cannot authenticate. Server `getUser()` output must link to a profile; only `app_metadata.role = ADMIN` grants administration. The proxy refreshes sessions but never supplies authorization. Guest clients use job-scoped capabilities, not account cookies.
+
+**People model:** Auth identity, application profile, provider profile and transaction participant are separate types. The client may remain a guest participant. Acceptance records `SELF_PROVIDED`; it does not establish verified identity. Private participant projections contain client contact details, while public agreement projections exclude them. See `docs/PHASE-5-USER-PROFILE-PARTICIPANTS.md`.
 
 **Must-do on every build:**
 - `source_channel` captured on every Job

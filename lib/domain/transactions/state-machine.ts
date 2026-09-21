@@ -30,7 +30,7 @@ export function acceptAggregate(current: JobAggregate, token: string, input: unk
   if (current.job.clientTokenUsed) throw new DomainError("This agreement has already been accepted.");
   const a = structuredClone(current);
   Object.assign(a.job, { clientName: details.name, clientEmail: details.email, clientPhone: details.phone, clientTokenUsed: true, status: nextStatus(current.job.status, "ACCEPT"), updatedAt: new Date().toISOString(), version: current.job.version + 1 });
-  event(a, actor, transactionRules.ACCEPT.event, { identityStatus: "SELF_PROVIDED", ...operation.metadata });
+  event(a, actor, transactionRules.ACCEPT.event, { participantDetailStatus: "SELF_PROVIDED", ...operation.metadata });
   return a;
 }
 

@@ -79,9 +79,9 @@ components/
 
 ## 4. Service / domain layer
 
-Current Phase 2 implementation: UI mutations call Server Actions, which resolve the actor and call `lib/domain/transactions/index.ts` (`TransactionService`) or `lib/domain/profiles/index.ts`. Services accept `lib/db/repository.ts`; `lib/db/local-store.ts` and `lib/db/supabase.ts` are independent adapters. `TRUSTLINK_STORAGE` must explicitly select `local` or `supabase`; production requires complete Supabase configuration. No hosted project is configured in this workspace.
+Current Phase 3 implementation: UI mutations call Server Actions, which resolve the actor and call `lib/domain/transactions/index.ts` (`TransactionService`) or `lib/domain/profiles/index.ts`. Services accept `lib/db/repository.ts`; `lib/db/local-store.ts` and `lib/db/supabase.ts` are independent adapters. `TRUSTLINK_STORAGE` must explicitly select `local` or `supabase`; production requires complete Supabase configuration. No hosted project is configured in this workspace.
 
-The canonical lifecycle implementation is `lib/domain/transactions/state-machine.ts`. Domain folders also cover jobs, participants, payments, deliveries, revisions, disputes, reviews and trust-events. `lib/domain/jobs.ts` is a compatibility re-export only. The older broad folder outline below is historical, not a list of completed services. See `docs/PHASE-2-LOCAL-BACKEND.md` for current persistence evidence and limits.
+The canonical lifecycle declaration is `lib/domain/transactions/policy.ts`; `state-machine.ts` authorizes and applies it. The UI imports `isActionAvailable()` from this policy for visibility, but this never replaces server authorization. Acceptance and commands require operation UUIDs and reviewed versions. Domain folders also cover jobs, participants, payments, deliveries, revisions, disputes, reviews and trust-events. `lib/domain/jobs.ts` is a compatibility re-export only. The older broad folder outline below is historical, not a list of completed services. See `docs/PHASE-3-CANONICAL-STATE-MACHINE.md` and `docs/PHASE-2-LOCAL-BACKEND.md` for evidence and limits.
 
 Business logic lives in `lib/`, not inside page components — this keeps the door open for a separate backend later without a rewrite.
 
@@ -102,35 +102,29 @@ lib/
 Core tables for V0.1 (fields abbreviated — full column definitions live in `supabase/migrations`):
 
 ```text
-users                  id, email, role (CLIENT|PROVIDER|ADMIN), status, created_at
-profiles                user_id, display_name, avatar, country, state, city
-provider_profiles       user_id, headline, bio, service_area, verification_status
-skills / provider_skills
-
-jobs                    id, public_id, provider_id, client_id, status, source_channel,
-                          provider_location, client_location, job_location
-job_terms               job_id, service, scope, price, currency, deadline, revisions, cancellation_terms
-job_events               job_id, event_type, timestamp   (lightweight per-job log; see trust_events for the canonical ledger)
-
-payments                job_id, payment_mode, reference, status
-payment_events           payment_id, event_type, timestamp
-payment_provider_accounts   (empty/unused until a partner is confirmed)
-
-deliveries               job_id, description, files, submitted_at
-revisions                job_id, description, affected_item, requested_at
-
-disputes                 job_id, category, description, status
-dispute_evidence          dispute_id, file, uploaded_at
-
-reviews                   job_id, reviewer_id, rating, comment, would_repeat
-
-trust_events              id, job_id, actor_id, event_type, timestamp, metadata   -- append-only, never overwritten
-
-notifications
-audit_logs
+auth.users              id, authentication data and trusted app metadata
+profiles                id, user_id, username, display_name, avatar, location, timestamps
+provider_profiles       id, user_id, headline, bio, service_area, verification_status, timestamps
+jobs                    id, public_id, provider_id, version, repeat_use, status, source_channel,
+                          location/view/completion timestamps
+job_participants        job_id, role, optional user_id, participant details and provenance,
+                          guest capability hash/expiry/use, timestamps
+job_terms               job_id, service, scope, numeric price, currency, date deadline,
+                          revisions, cancellation terms, timestamps
+payments                job_id, recorded report fields and NOT_VERIFIED status
+deliveries              job_id, description, private file references, submitted_by/at
+revisions               job_id, revision_number, description, requested_by/at
+disputes                job_id, contested term, claim/evidence, resolution and timestamps
+reviews                 job_id, reviewer, rating, comment, submitted_at
+evidence_files          job_id, private storage metadata, uploader and created_at
+trust_events            id, job_id, actor, event_type, occurred_at, metadata, created_at
 ```
 
-**No wallet, escrow, or internal-balance tables exist.** `payments` records that a payment happened; it never represents TrustLink holding funds.
+`job_participants` is authoritative for client contact/capability data; the application aggregate reconstructs its legacy-shaped `job` DTO through the private read RPC. Fee and deadline use `numeric(14,2)` and `date` in PostgreSQL while the domain projection returns stable strings. The job `version` is the optimistic-concurrency version for the aggregate and its mutable child state.
+
+`trust_events` is the single event ledger, so no duplicate `job_events` or `payment_events` tables exist. `evidence_files` is the single attachment registry, so there is no duplicate dispute-evidence table. Notifications, analytics and broad audit logs have no implemented workflow and no empty tables. Derived reputation comes from completed jobs/reviews rather than provider-profile counters. **No wallet, escrow, or internal-balance tables exist.**
+
+`lib/db/database.generated.ts` is generated from the cumulative migrations by `npm run db:types`; `npm run typecheck` rejects schema/type drift. Domain DTOs remain separate because the transaction aggregate is an intentional RPC projection rather than a copy of one physical table. See `docs/PHASE-6-DATABASE-MODEL.md`.
 
 ## 6. Job state machine
 
@@ -145,6 +139,8 @@ SENT → CANCELLED (provider)
 ```
 
 Creation publishes directly into SENT. DRAFT is a reserved enum value, with no draft editor. JOB_VIEWED is reserved analytics, never a lifecycle state. No page fetch writes trust events. Review and participant-link rotation append events without changing status. See docs/FINAL-INTEGRITY-AUDIT.md for the exact authorized transition matrix.
+
+The diagram summarizes `lib/domain/transactions/policy.ts`; it is not a separate rule set. PostgreSQL constrains the status/event vocabulary and atomically persists the aggregate. Transition eligibility remains in the TypeScript policy and state machine.
 
 ### Reserved for later (do not implement as reachable states yet)
 
@@ -183,7 +179,11 @@ V0.1's implementation returns `{ protectedFunds: false, authorization: false, pa
 
 ## 9. Auth & roles
 
-Supabase Auth SSR email/password and email confirmation. Magic-link login is not implemented. Account actors are `PROVIDER` or `ADMIN` (administrator role comes from trusted Auth app metadata). A client uses a scoped, expiring `CLIENT_PARTICIPANT` capability. Actor identity comes from the server-validated session or capability, never a submitted ID.
+`lib/auth/contracts.ts` is the application authentication boundary. In Supabase mode it delegates email/password login, signup, email confirmation, validated identity lookup and logout to Supabase Auth SSR. In local mode the explicit unconfigured provider never authenticates; there is no alternate password/session system or development dashboard bypass.
+
+Account actors are `PROVIDER` or `ADMIN`. The server calls Supabase `getUser()`, then requires a linked application profile. Administrator role comes only from trusted Auth `app_metadata`; editable `user_metadata` cannot grant it. A client uses a scoped, expiring `CLIENT_PARTICIPANT` capability rather than an account. Actor identity comes from the server-validated session or capability, never a submitted ID. The proxy refreshes cookies but protected pages, actions and data access authorize independently. Magic-link login, password recovery, MFA and social login are not implemented. See `docs/PHASE-4-AUTHENTICATION-ARCHITECTURE.md`.
+
+Auth identity, application profile, provider profile and transaction participant are separate models. `AuthIdentity` contains the validated account principal; `ApplicationProfileRecord` supplies application presentation; `ProviderProfileRecord` supplies provider-specific fields; `TransactionParticipant` represents a provider or client inside one transaction. A client can remain a guest authorized by the scoped capability. Acceptance records its contact provenance as `SELF_PROVIDED`, not verified identity. `EMAIL_VERIFIED` and `OTHER_VERIFIED` are reserved typed values with no current emitting workflow. Participant contact details are available only in authorized workspaces and remain absent from `PublicJobProjection`. See `docs/PHASE-5-USER-PROFILE-PARTICIPANTS.md`.
 
 ## 10. Security model
 

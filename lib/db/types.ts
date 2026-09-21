@@ -19,7 +19,7 @@ export type SourceChannel =
   | "QR Code"
   | "Other";
 
-export interface ProfileRecord {
+export interface ApplicationProfileRecord {
   id: string;
   userId: string;
   username: string;
@@ -38,11 +38,16 @@ export interface ProviderProfileRecord {
   bio?: string;
   serviceArea: string;
   verificationStatus: "UNVERIFIED" | "IDENTITY_PROVIDED" | "VERIFIED_BY_TRUSTLINK";
-  completedJobsCount: number;
-  averageRating: number | null;
-  onTimeRate: number | null;
   createdAt: string;
 }
+
+export const participantDetailStatuses = [
+  "SELF_PROVIDED",
+  "EMAIL_VERIFIED",
+  "OTHER_VERIFIED",
+  "UNKNOWN",
+] as const;
+export type ParticipantDetailStatus = typeof participantDetailStatuses[number];
 
 export interface JobTermsRecord {
   id: string;
@@ -85,6 +90,11 @@ export interface JobRecord {
   updatedAt: string;
   terms?: JobTermsRecord;
 }
+
+export type JobSummaryRecord = Pick<JobRecord,
+  "id" | "publicId" | "providerId" | "version" | "repeatUse" | "status" |
+  "sourceChannel" | "providerLocation" | "createdAt" | "updatedAt" | "completedAt" | "clientName"
+> & { terms?: JobTermsRecord };
 
 export interface PublicJobProjection {
   publicId: string;
