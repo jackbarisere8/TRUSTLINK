@@ -107,6 +107,8 @@ export type Database = {
           size_bytes: number;
           uploaded_by: string;
           created_at: string;
+          purpose: string;
+          attachment_status: string;
         };
         Insert: {
           id?: string;
@@ -117,6 +119,8 @@ export type Database = {
           size_bytes: number;
           uploaded_by: string;
           created_at?: string;
+          purpose: string;
+          attachment_status?: string;
         };
         Update: {
           id?: string;
@@ -127,6 +131,8 @@ export type Database = {
           size_bytes?: number;
           uploaded_by?: string;
           created_at?: string;
+          purpose?: string;
+          attachment_status?: string;
         };
         Relationships: [
           {
@@ -322,6 +328,48 @@ export type Database = {
           }
         ];
       };
+      notification_intents: {
+        Row: {
+          id: string;
+          job_id: string;
+          event_id: string;
+          notification_kind: string;
+          recipient_role: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          job_id: string;
+          event_id: string;
+          notification_kind: string;
+          recipient_role: string;
+          created_at: string;
+        };
+        Update: {
+          id?: string;
+          job_id?: string;
+          event_id?: string;
+          notification_kind?: string;
+          recipient_role?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notification_intents_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "trust_events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notification_intents_job_id_fkey";
+            columns: ["job_id"];
+            isOneToOne: false;
+            referencedRelation: "jobs";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       payments: {
         Row: {
           id: string;
@@ -332,6 +380,8 @@ export type Database = {
           recorded_by: string;
           verification_status: string;
           recorded_at: string;
+          amount: number;
+          currency: string;
         };
         Insert: {
           id?: string;
@@ -342,6 +392,8 @@ export type Database = {
           recorded_by?: string;
           verification_status?: string;
           recorded_at?: string;
+          amount: number;
+          currency: string;
         };
         Update: {
           id?: string;
@@ -352,6 +404,8 @@ export type Database = {
           recorded_by?: string;
           verification_status?: string;
           recorded_at?: string;
+          amount?: number;
+          currency?: string;
         };
         Relationships: [
           {
@@ -534,6 +588,7 @@ export type Database = {
           occurred_at: string;
           metadata: Json;
           created_at: string;
+          event_sequence: number;
         };
         Insert: {
           id?: string;
@@ -544,6 +599,7 @@ export type Database = {
           occurred_at?: string;
           metadata?: Json;
           created_at?: string;
+          event_sequence: number;
         };
         Update: {
           id?: string;
@@ -554,6 +610,7 @@ export type Database = {
           occurred_at?: string;
           metadata?: Json;
           created_at?: string;
+          event_sequence?: number;
         };
         Relationships: [
           {
@@ -571,12 +628,8 @@ export type Database = {
         Row: {
           public_id: string | null;
           status: string | null;
-          source_channel: string | null;
           provider_location: string | null;
-          created_at: string | null;
-          first_viewed_at: string | null;
           service: string | null;
-          service_category: string | null;
           scope: string | null;
           deliverables: Json | null;
           price: number | null;
@@ -587,9 +640,17 @@ export type Database = {
           cancellation_terms: string | null;
           provider_username: string | null;
           provider_name: string | null;
-          provider_avatar: string | null;
-          provider_role: string | null;
-          provider_verification_status: string | null;
+          provider_headline: string | null;
+        };
+        Relationships: [];
+      };
+      public_transaction_events: {
+        Row: {
+          public_id: string | null;
+          id: string | null;
+          event_type: string | null;
+          occurred_at: string | null;
+          event_sequence: number | null;
         };
         Relationships: [];
       };

@@ -253,3 +253,4 @@ TrustLink
 
 The first model requires TrustLink to be excellent at one thing.  
 The second model requires TrustLink to be operational at four different businesses simultaneously, before validating any of them.
+

@@ -65,7 +65,7 @@ Everything attaches to a Job: provider, client, service, scope, price, deadline,
 
 **During work:** in progress → messages → evidence → delivery.
 
-**Completion:** delivery submitted → client review → approve or request revision → settlement (recorded) → completed → reputation event.
+**Completion:** delivery submitted → client review → approve or request revision → completed → reputation event.
 
 ## 7. Page requirements (brief)
 

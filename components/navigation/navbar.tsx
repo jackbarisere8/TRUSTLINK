@@ -34,14 +34,14 @@ export function Navbar({ variant = "light", className }: NavbarProps) {
     <header
       className={cn(
         "sticky top-0 z-50 w-full",
-        isLight && "bg-white border-b border-surface-200",
+        isLight && "bg-white border-b border-[#dbe2e3]",
         isDark  && "bg-navy-900/95 border-b border-navy-800",
         variant === "transparent" && "bg-transparent",
         className
       )}
     >
       <nav
-        className="shell flex items-center justify-between h-16"
+        className="shell flex items-center justify-between h-[72px]"
         aria-label="Main navigation"
       >
         {/* ── Logo ── */}
@@ -53,7 +53,7 @@ export function Navbar({ variant = "light", className }: NavbarProps) {
 
         {/* ── Desktop Links ── */}
         <ul
-          className="hidden lg:flex items-center gap-7 list-none m-0 p-0"
+          className="hidden lg:flex items-center gap-8 list-none m-0 p-0"
           role="list"
         >
           {navLinks.map(({ href, label }) => (
@@ -74,7 +74,7 @@ export function Navbar({ variant = "light", className }: NavbarProps) {
         </ul>
 
         {/* ── Desktop CTA & Log in ── */}
-        <div className="hidden lg:flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-5">
           <Link
             href="/login"
             className={cn(
@@ -112,7 +112,7 @@ export function Navbar({ variant = "light", className }: NavbarProps) {
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className={cn(
-              "p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-teal-500",
+              "p-2 rounded-sm border focus:outline-none focus:ring-2 focus:ring-teal-500",
               isLight
                 ? "border-surface-200 text-navy-900 hover:bg-surface-100"
                 : "border-navy-700 text-white hover:bg-navy-800"
@@ -138,7 +138,7 @@ export function Navbar({ variant = "light", className }: NavbarProps) {
         <div
           id="mobile-navigation"
           className={cn(
-            "lg:hidden border-b px-4 py-5 space-y-4 animate-fade-in",
+            "lg:hidden border-b px-5 py-5 space-y-4",
             isLight
               ? "bg-white border-surface-200"
               : "bg-navy-900 border-navy-800 text-white"

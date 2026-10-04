@@ -224,3 +224,4 @@ TrustLink's opportunity listings (opp_01–opp_08) that cannot be verified again
 4. **NASIC is a potential partner.** An artisan registered on NASIC who also uses TrustLink for their transactions gets credential + transaction trust — a stronger signal than either alone.
 
 5. **LEEP is a potential router destination.** When a TrustLink user says "I need an opportunity," send them to LEEP Jobs — don't maintain a competing database.
+

@@ -14,45 +14,45 @@ const config: Config = {
         // Do NOT use generic Tailwind slate-900; use these named tokens.
         navy: {
           DEFAULT: "#0B1526",
-          50:  "#e8edf5",
-          100: "#c5d1e8",
-          200: "#9fb2d8",
-          300: "#7893c7",
-          400: "#5877b9",
-          500: "#3c5dac",
-          600: "#2d479d",
-          700: "#1e3288",
-          800: "#0f1f6e",
+          50:  "#eef2f4",
+          100: "#dbe4e8",
+          200: "#bccbd2",
+          300: "#94aab5",
+          400: "#6f8b9a",
+          500: "#506c7c",
+          600: "#365566",
+          700: "#253f51",
+          800: "#172b3e",
           900: "#0B1526",
           950: "#070d1a",
         },
         // ── Trust Teal — confirmed states, verified marks ───────────────
         teal: {
-          DEFAULT: "#0d9488",
-          50:  "#f0fdfa",
-          100: "#ccfbf1",
-          200: "#99f6e4",
-          300: "#5eead4",
-          400: "#2dd4bf",
-          500: "#14b8a6",
-          600: "#0d9488",
-          700: "#0f766e",
-          800: "#115e59",
-          900: "#134e4a",
+          DEFAULT: "#087f79",
+          50:  "#edf7f5",
+          100: "#d6eae6",
+          200: "#acd6cf",
+          300: "#7dbdb3",
+          400: "#4ca69b",
+          500: "#168f85",
+          600: "#087f79",
+          700: "#0a6f69",
+          800: "#105a56",
+          900: "#134b49",
         },
         // ── Surface Neutrals ────────────────────────────────────────────
         surface: {
           0:   "#ffffff",
-          50:  "#f8fafc",
-          100: "#f1f5f9",
-          200: "#e2e8f0",
-          300: "#cbd5e1",
-          400: "#94a3b8",
-          500: "#64748b",
-          600: "#475569",
-          700: "#334155",
-          800: "#1e293b",
-          900: "#0f172a",
+          50:  "#f7f8f6",
+          100: "#eef2f0",
+          200: "#dbe2e3",
+          300: "#cbd6d9",
+          400: "#687b86",
+          500: "#5b6d78",
+          600: "#516372",
+          700: "#334e5c",
+          800: "#1f3442",
+          900: "#0b1526",
         },
         // ── Status Palette ──────────────────────────────────────────────
         success: {
@@ -78,39 +78,28 @@ const config: Config = {
       },
 
       fontFamily: {
-        // Primary: system sans-serif stack — clean, legible, Nigerian-device friendly
+        // Primary interface stack; keep aligned with --font-sans in globals.css.
         sans: [
+          "Aptos",
           "Inter",
+          '"Segoe UI"',
           "ui-sans-serif",
           "system-ui",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          '"Segoe UI"',
-          "Roboto",
-          '"Helvetica Neue"',
-          "Arial",
           "sans-serif",
         ],
-        // Serif: for high-impact headlines (job titles, hero text, amount displays)
+        // Serif is reserved for display moments, not product headings or amounts.
         serif: [
           "Georgia",
           '"Times New Roman"',
           "Times",
           "serif",
         ],
-        // Mono: for IDs, references, code
+        // Mono is reserved for IDs, dates, timestamps and references.
         mono: [
-          '"JetBrains Mono"',
-          '"Fira Code"',
-          '"Fira Mono"',
-          '"Roboto Mono"',
           "ui-monospace",
           "SFMono-Regular",
-          "Menlo",
-          "Monaco",
           "Consolas",
           '"Liberation Mono"',
-          '"Courier New"',
           "monospace",
         ],
       },
@@ -204,4 +193,3 @@ const config: Config = {
 };
 
 export default config;
-

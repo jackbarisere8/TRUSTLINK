@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "db:types": "node --import tsx scripts/generate-database-types.mts",
     "db:types:check": "node --import tsx scripts/generate-database-types.mts --check",
+    "supabase:hosted:preflight": "node --env-file=.env.local --import tsx scripts/hosted-supabase-preflight.mts",
     "typecheck": "npm run db:types:check && tsc --noEmit",
     "test": "node --conditions=react-server --import tsx --test tests/*.test.ts",
     "test:browser": "playwright test",

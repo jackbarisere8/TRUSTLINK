@@ -57,14 +57,10 @@ export function CareerAtlasView() {
 
   return (
     <div className="space-y-8">
-      {/* ── Prominent Pathfinder Bridge Banner ── */}
-      <div className="bg-gradient-to-r from-navy-900 via-navy-800 to-navy-900 border border-teal-500/30 rounded-2xl p-6 sm:p-7 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      {/* Pathfinder is a useful route from the catalog, not a promotional badge. */}
+      <div className="border-t-2 border-teal-600 bg-navy-900 px-6 py-7 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:px-8">
         <div className="space-y-2 max-w-xl">
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-2xs font-semibold">
-            <span>Directional Guidance</span>
-            <span>·</span>
-            <span>2 Minutes</span>
-          </div>
+          <p className="text-xs font-semibold text-teal-200">Pathfinder / Directional guidance</p>
           <h2 className="text-xl sm:text-2xl font-sans font-normal">
             Unsure which trade or tech pathway suits your strengths?
           </h2>
@@ -78,12 +74,12 @@ export function CareerAtlasView() {
           size="md"
           className="flex-shrink-0 whitespace-nowrap"
         >
-          Start Pathfinder Quiz (2m) →
+          Explore Pathfinder →
         </Button>
       </div>
 
       {/* ── Filter Controls ── */}
-      <div className="bg-white border border-surface-200 rounded-xl p-6 space-y-5">
+      <div className="space-y-5 border-y border-[#dbe2e3] py-6">
         <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
           {/* Search Box */}
           <div className="relative flex-1 max-w-md">
@@ -102,7 +98,7 @@ export function CareerAtlasView() {
           </div>
 
           {/* Under-18 Safeguard Filter */}
-          <label className="inline-flex items-center gap-2 text-xs font-semibold text-surface-600 cursor-pointer select-none bg-surface-50 px-3 py-2 rounded-lg border border-surface-200">
+          <label className="inline-flex items-center gap-2 text-xs font-semibold text-surface-600 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={minorOnly}
@@ -113,8 +109,8 @@ export function CareerAtlasView() {
           </label>
         </div>
 
-        {/* Category Pill Filters */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+        {/* Category filters */}
+        <div className="flex items-center gap-5 overflow-x-auto border-b border-[#dbe2e3] scrollbar-thin">
           {ALL_CATEGORIES.map((cat) => {
             const isActive = selectedCategory === cat;
             return (
@@ -122,11 +118,12 @@ export function CareerAtlasView() {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all whitespace-nowrap ${
+                className={`whitespace-nowrap border-b-2 pb-3 text-xs font-semibold transition-colors ${
                   isActive
-                    ? "bg-navy-900 text-white shadow-sm"
-                    : "bg-surface-100 hover:bg-surface-200 text-surface-600"
+                    ? "border-teal-700 text-navy-900"
+                    : "border-transparent text-surface-600 hover:border-surface-300 hover:text-navy-900"
                 }`}
+                aria-pressed={isActive}
               >
                 {cat}
               </button>
@@ -151,26 +148,22 @@ export function CareerAtlasView() {
         )}
       </div>
 
-      {/* ── Career Cards Grid ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Editorial catalog rows keep the information scannable without a card wall. */}
+      <div className="grid grid-cols-1 gap-x-10 md:grid-cols-2">
         {filteredCareers.map((career) => (
           <article
             key={career.id}
             id={career.slug}
-            className="bg-white border border-surface-200 rounded-xl p-6 hover:shadow-card-md hover:border-teal-500/40 transition-all flex flex-col justify-between"
+            className="flex flex-col justify-between border-t border-[#dbe2e3] py-7"
           >
             <div className="space-y-4">
               {/* Category & Status */}
               <div className="flex items-center justify-between">
-                <span className="text-2xs font-bold  px-2 py-0.5 rounded bg-surface-100 text-navy-800">
+                <span className="text-xs font-semibold text-surface-600">
                   {career.category}
                 </span>
                 <span
-                  className={`text-2xs font-semibold px-2 py-0.5 rounded border ${
-                    career.trendStatus === "Emerging"
-                      ? "bg-purple-50 text-purple-700 border-purple-200"
-                      : "bg-emerald-50 text-emerald-700 border-emerald-200"
-                  }`}
+                  className="text-2xs text-surface-600"
                 >
                   Editorial: {career.trendStatus}
                 </span>
@@ -234,7 +227,7 @@ export function CareerAtlasView() {
               </button>
               <Link
                 href={`/opportunities?career=${career.slug}`}
-                className="text-2xs font-bold  text-navy-900 bg-surface-100 hover:bg-surface-200 px-3 py-1.5 rounded transition-colors"
+                className="border-b border-[#b6c6c9] pb-1 text-2xs font-semibold text-navy-900 hover:border-teal-700"
               >
                 Find Gigs &amp; Jobs
               </Link>
@@ -244,9 +237,9 @@ export function CareerAtlasView() {
       </div>
 
       {filteredCareers.length === 0 && (
-        <div className="text-center py-16 bg-white border border-surface-200 rounded-xl p-8 space-y-4">
+        <div className="space-y-4 border-y border-[#dbe2e3] py-12">
           <p className="text-xl font-sans text-navy-900">No pathways match your filter</p>
-          <p className="text-sm text-surface-500 max-w-md mx-auto">
+          <p className="text-sm text-surface-500 max-w-md">
             Try resetting your search query or selecting &ldquo;All&rdquo; categories to explore the complete Nigerian career catalog.
           </p>
           <Button

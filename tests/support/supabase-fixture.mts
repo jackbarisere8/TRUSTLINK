@@ -27,6 +27,19 @@ await pg.exec((await readFile("supabase/migrations/20260917000000_v0_core.sql","
 await pg.exec(await readFile("supabase/migrations/20260920000000_integrity.sql","utf8"));
  await pg.exec(await readFile("supabase/migrations/20260920000001_final_audit.sql","utf8"));
  await pg.exec(await readFile("supabase/migrations/20260921000000_database_model.sql","utf8"));
+ await pg.exec(await readFile("supabase/migrations/20260921000001_database_security.sql","utf8"));
+ await pg.exec(await readFile("supabase/migrations/20260921000002_trust_event_ledger.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260921000003_payment_semantics.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260922000000_real_job_creation.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260922000001_public_transaction_projection.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260922000002_secure_client_capabilities.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260922000003_client_acceptance.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260924000000_work_delivery_revisions.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260924000001_evidence_storage.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260926000000_disputes.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260926000001_reviews_trust_profile.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260927000000_transaction_notifications.sql","utf8"));
+await pg.exec(await readFile("supabase/migrations/20260927000001_validation_analytics.sql","utf8"));
 for(const u of users)await pg.query("INSERT INTO auth.users VALUES ($1,$2)",[u.id,{display_name:u.name}]);
 function authUser(u:FixtureUser) {return {id:u.id,email:u.email,aud:"authenticated",role:"authenticated",app_metadata:{role:u.role},user_metadata:{display_name:u.name,role:u.userMetadataRole},created_at:new Date().toISOString()};}
 function session(u:FixtureUser) {
@@ -36,7 +49,7 @@ function session(u:FixtureUser) {
  sessions.set(token,u);
  return {access_token:token,refresh_token:"fixture-refresh-"+u.id,token_type:"bearer",expires_in:3600,expires_at:now+3600,user:authUser(u)};
 }
-const allowedTables=["profiles","provider_profiles","jobs","job_terms","job_participants","payments","deliveries","revisions","disputes","reviews","trust_events","evidence_files"];
+const allowedTables=["profiles","provider_profiles","jobs","job_terms","job_participants","payments","deliveries","revisions","disputes","reviews","trust_events","evidence_files","notification_intents","public_job_records","public_transaction_events"];
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url!,"http://127.0.0.1:54329");
  const send=(status:number,data:unknown)=>{res.writeHead(status,{"Content-Type":"application/json"});res.end(JSON.stringify(data));};
@@ -84,6 +97,10 @@ const server=http.createServer(async(req,res)=>{
       if(value.startsWith("eq.")){values.push(value.slice(3));clauses.push(key+"=$"+values.length);}
       else if(value.startsWith("in.(")){const entries=value.slice(4,-1).split(",").map(v=>v.replaceAll('"',""));const vars=entries.map(v=>{values.push(v);return "$"+values.length;});clauses.push(key+" IN ("+vars.join(",")+")");}
     }
+    if(req.method==="DELETE"){
+      const rows=await pg.query("DELETE FROM public."+table+(clauses.length?" WHERE "+clauses.join(" AND "):"")+" RETURNING *",values);
+      return send(200,rows.rows);
+    }
     const rows=await pg.query("SELECT * FROM public."+table+(clauses.length?" WHERE "+clauses.join(" AND "):""),values);
     return send(200,req.headers.accept?.includes("vnd.pgrst.object")?rows.rows[0]||null:rows.rows);
   }
@@ -94,6 +111,11 @@ const server=http.createServer(async(req,res)=>{
   }
   if(url.pathname.startsWith("/storage/v1/object/")&&req.method==="POST"){
     const path=url.pathname.replace("/storage/v1/object/","");files.set(path,body);return send(200,{Key:path});
+  }
+  if(url.pathname==="/storage/v1/object/transaction-evidence"&&req.method==="DELETE"){
+    const input=json() as {prefixes?:string[]};
+    for(const path of input.prefixes || [])files.delete("transaction-evidence/"+path);
+    return send(200,{message:"Successfully deleted"});
   }
   return send(404,{message:"Not implemented by test fixture"});
  }catch(error){const e=error as {message:string;code?:string};return send(400,{message:e.message,code:e.code});}

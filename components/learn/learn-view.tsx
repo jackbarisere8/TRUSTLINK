@@ -162,22 +162,14 @@ export function LearnView() {
         {filtered.map((bp) => (
           <article
             key={bp.id}
-            className="bg-white border border-surface-200 rounded-xl p-6 hover:shadow-card-md hover:border-teal-500/40 transition-all flex flex-col justify-between"
+            className="bg-white border border-surface-200 rounded-xl p-6 hover:shadow-card-md hover:border-surface-300 transition-all flex flex-col justify-between"
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-2xs font-bold  px-2 py-0.5 rounded bg-surface-100 text-navy-900">
                   {bp.category}
                 </span>
-                <span
-                  className={`text-2xs font-semibold px-2 py-0.5 rounded ${
-                    bp.difficulty === "Beginner"
-                      ? "bg-emerald-50 text-emerald-700"
-                      : bp.difficulty === "Intermediate"
-                      ? "bg-blue-50 text-blue-700"
-                      : "bg-purple-50 text-purple-700"
-                  }`}
-                >
+                <span className="text-2xs font-semibold px-2 py-0.5 rounded bg-surface-100 text-surface-700">
                   {bp.difficulty} · {bp.estimatedTime}
                 </span>
               </div>
@@ -209,7 +201,7 @@ export function LearnView() {
                 <ul className="space-y-1 text-xs text-surface-600">
                   {bp.deliverablesEvidence.slice(0, 2).map((item, idx) => (
                     <li key={idx} className="flex items-start gap-1.5">
-                      <span className="text-teal-600 font-bold flex-shrink-0">✓</span>
+                      <span className="text-surface-600 font-bold flex-shrink-0">✓</span>
                       <span className="line-clamp-1">{item}</span>
                     </li>
                   ))}
@@ -299,9 +291,9 @@ export function LearnView() {
               </ul>
             </div>
 
-            <div className="p-4 rounded-xl bg-teal-50 border border-teal-200 space-y-1 text-xs text-teal-950">
+            <div className="p-4 rounded-xl bg-surface-50 border border-surface-200 space-y-1 text-xs text-navy-900">
               <p className="font-bold">Turn this project into your Trust Profile proof:</p>
-              <p className="text-teal-800">
+              <p className="text-surface-700">
                 When completed, upload the documentation files to your TrustLink account. Prospective clients can inspect your actual execution before hiring you.
               </p>
             </div>
@@ -329,4 +321,3 @@ export function LearnView() {
     </div>
   );
 }
-

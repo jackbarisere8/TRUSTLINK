@@ -54,6 +54,7 @@ test("engine and UI obey the authorized lifecycle across every status and actor 
     { command: { type: "RESOLVE", notes: "Close dispute", outcome: "CANCELLED" }, roles: ["ADMIN"], from: ["DISPUTED"], to: "CANCELLED" },
     { command: { type: "REVIEW", rating: 4 }, roles: ["CLIENT_PARTICIPANT"], from: ["COMPLETED"] },
     { command: { type: "ROTATE_INVITE" }, roles: ["PROVIDER"], from: ["SENT", "ACCEPTED", "PAYMENT_RECORDED", "IN_PROGRESS", "DELIVERY_SUBMITTED", "REVISION_REQUESTED", "APPROVED", "COMPLETED", "DISPUTED"] },
+    { command: { type: "REVOKE_INVITE" }, roles: ["PROVIDER"], from: ["SENT", "ACCEPTED", "PAYMENT_RECORDED", "IN_PROGRESS", "DELIVERY_SUBMITTED", "REVISION_REQUESTED", "APPROVED", "COMPLETED", "DISPUTED"] },
   ];
   for (const item of cases) for (const status of jobStatuses) for (const actor of [provider, client, admin]) {
     const current = records[status];
@@ -91,6 +92,49 @@ test("acceptance checks reviewed version, confirmation, replay payload and capab
   assert.throws(() => acceptAggregate(cancelled, token, details, requestFor(cancelled)), /state/);
 });
 
+test("accept, payment, start, delivery, approval, revision, dispute and review are exact-operation idempotent", () => {
+  const { records, token, client } = fixtures();
+  const acceptanceRequest = requestFor(records.SENT);
+  const accepted = acceptAggregate(records.SENT, token, details, acceptanceRequest);
+  assert.equal(acceptAggregate(accepted, token, details, acceptanceRequest), accepted);
+  assert.equal(accepted.job.version, records.SENT.job.version + 1);
+  assert.equal(accepted.events.filter(event => event.eventType === "JOB_ACCEPTED").length, 1);
+
+  const cases: Array<{ current: JobAggregate; actor: Actor; command: JobCommand; eventType: string }> = [
+    { current: records.ACCEPTED, actor: provider, command: { type: "PAYMENT" }, eventType: "PAYMENT_RECORDED" },
+    { current: records.PAYMENT_RECORDED, actor: provider, command: { type: "START" }, eventType: "WORK_STARTED" },
+    { current: records.IN_PROGRESS, actor: provider, command: { type: "DELIVER", description: "Submitted work", files: [] }, eventType: "DELIVERY_SUBMITTED" },
+    { current: records.DELIVERY_SUBMITTED, actor: client, command: { type: "APPROVE" }, eventType: "DELIVERY_APPROVED" },
+    { current: records.DELIVERY_SUBMITTED, actor: client, command: { type: "REVISE", description: "Adjust the heading" }, eventType: "REVISION_REQUESTED" },
+    { current: records.IN_PROGRESS, actor: client, command: { type: "DISPUTE", contestedTerm: "Scope", description: "Missing work", files: [] }, eventType: "DISPUTE_OPENED" },
+    { current: records.COMPLETED, actor: client, command: { type: "REVIEW", rating: 4, comment: "Clear delivery" }, eventType: "CLIENT_REVIEWED" },
+  ];
+  for (const { current, actor, command, eventType } of cases) {
+    const request = requestFor(current);
+    const first = transition(current, actor, command, request);
+    const replay = transition(first.aggregate, actor, command, request);
+    assert.equal(replay.replayed, true, command.type);
+    assert.equal(replay.aggregate, first.aggregate, command.type);
+    assert.equal(first.aggregate.job.version, current.job.version + 1, command.type);
+    assert.equal(first.aggregate.events.length, current.events.length + 1, command.type);
+    assert.equal(first.aggregate.events.filter(event => event.eventType === eventType).length,
+      current.events.filter(event => event.eventType === eventType).length + 1, command.type);
+  }
+});
+
+test("only the non-raising transaction party can respond once while the dispute stays paused", () => {
+  const { records, client } = fixtures();
+  const disputed = records.DISPUTED;
+  assert.equal(isActionAvailable("DISPUTED","PROVIDER","RESPOND_DISPUTE"),true);
+  assert.equal(isActionAvailable("DISPUTED","CLIENT_PARTICIPANT","RESPOND_DISPUTE"),true);
+  assert.throws(() => apply(disputed,client,{type:"RESPOND_DISPUTE",response:"Repeated claimant view"}),/other transaction party/);
+  const responded = apply(disputed,provider,{type:"RESPOND_DISPUTE",response:"Provider response"});
+  assert.equal(responded.job.status,"DISPUTED");
+  assert.equal(responded.disputes.at(-1)?.disputeStatus,"UNDER_REVIEW");
+  assert.throws(() => apply(responded,provider,{type:"RESPOND_DISPUTE",response:"Second response"}),/open dispute|already responded/);
+  assert.equal(isActionAvailable("IN_PROGRESS","PROVIDER","RESPOND_DISPUTE"),false);
+});
+
 test("mutations reject missing versions and invalid runtime payloads; link retries cannot rotate twice", () => {
   const { aggregate } = create();
   const before = JSON.stringify(aggregate);
@@ -106,6 +150,11 @@ test("mutations reject missing versions and invalid runtime payloads; link retri
   assert.equal(second.token, undefined); // Plain capabilities are never persisted for replay.
   assert.ok(first.token);
   assert.equal(first.aggregate.events.length, aggregate.events.length + 1);
+  const revokeRequest = requestFor(first.aggregate);
+  const revoked = transition(first.aggregate, provider, { type: "REVOKE_INVITE" }, revokeRequest);
+  const revokedReplay = transition(revoked.aggregate, provider, { type: "REVOKE_INVITE" }, revokeRequest);
+  assert.equal(revokedReplay.replayed, true);
+  assert.equal(revokedReplay.aggregate, revoked.aggregate);
 });
 
 test("service rechecks capability on its current read, including replay, and propagates failed atomic commits", async () => {
@@ -127,4 +176,98 @@ test("service rechecks capability on its current read, including replay, and pro
   await assert.rejects(service.execute(current.job.id, client, { type: "APPROVE" }, request, token), /expired/);
   await assert.rejects(service.execute(current.job.id, client, { type: "APPROVE" }, { id: randomUUID(), expectedVersion: current.job.version }), /expired/);
   assert.equal(writes, 1);
+});
+
+test("simultaneous payment requests resolve to one payment and one event", async () => {
+  const { records } = fixtures();
+  let current = structuredClone(records.ACCEPTED);
+  let commitAttempts = 0;
+  const repository = {
+    getAggregate: async () => structuredClone(current),
+    commit: async (aggregate: JobAggregate, expectedVersion: number | null) => {
+      commitAttempts++;
+      if (expectedVersion === null || current.job.version !== expectedVersion) throw new Error("Concurrent change");
+      current = structuredClone(aggregate);
+    },
+  } as unknown as Repository;
+  const service = new TransactionService(repository);
+  const request = requestFor(current);
+  const command = { type: "PAYMENT" as const, reference: "  Bank transfer  ", notes: "  Received directly  " };
+  const responses = await Promise.all([
+    service.execute(current.job.id, provider, command, request),
+    service.execute(current.job.id, provider, command, request),
+  ]);
+  assert.deepEqual(responses.map(response => response.replayed).sort(), [false, true]);
+  assert.equal(commitAttempts, 2);
+  assert.equal(current.job.status, "PAYMENT_RECORDED");
+  assert.deepEqual(current.payments.map(payment => [payment.reference,payment.notes]), [["Bank transfer","Received directly"]]);
+  assert.equal(current.events.filter(event => event.eventType === "PAYMENT_RECORDED").length, 1);
+});
+
+test("simultaneous acceptance resolves to one acceptance and one event", async () => {
+  const { aggregate, token } = create();
+  let current = structuredClone(aggregate);
+  let commitAttempts = 0;
+  const repository = {
+    getAggregate: async () => structuredClone(current),
+    commit: async (candidate: JobAggregate, expectedVersion: number | null) => {
+      commitAttempts++;
+      if (expectedVersion === null || current.job.version !== expectedVersion) throw new Error("Concurrent change");
+      current = structuredClone(candidate);
+    },
+  } as unknown as Repository;
+  const service = new TransactionService(repository);
+  const request = requestFor(current);
+  const responses = await Promise.all([
+    service.accept(current.job.publicId, token, details, request),
+    service.accept(current.job.publicId, token, details, request),
+  ]);
+  assert.deepEqual(responses.map(response => response.job.status), ["ACCEPTED", "ACCEPTED"]);
+  assert.equal(commitAttempts, 2);
+  assert.equal(current.events.filter(event => event.eventType === "JOB_ACCEPTED").length, 1);
+});
+
+test("simultaneous creation returns one exact record and rejects changed creation-key reuse", async () => {
+  const profile = { id: "profile", userId: provider.id, username: "provider", displayName: "Provider", country: "Nigeria", state: "Lagos", city: "Ikeja", createdAt: new Date().toISOString() };
+  const creation = { creationId: randomUUID(), title: "Design", category: "Design", scope: "Agreed scope", deliverables: ["Design file"], price: "1000", deadline: "2099-01-01", revisions: 1, cancellationTerms: "Discuss before work starts", sourceChannel: "Direct" as const, repeatUse: "FIRST" as const, confirmed: true as const };
+  const run = async (second: typeof creation) => {
+    let current: JobAggregate | null = null;
+    const repository = {
+      getAggregate: async () => current ? structuredClone(current) : null,
+      listJobs: async () => [],
+      getProfileByUserId: async () => profile,
+      commit: async (candidate: JobAggregate, expectedVersion: number | null) => {
+        if (expectedVersion !== null || current) throw new Error("Concurrent change");
+        current = structuredClone(candidate);
+      },
+    } as unknown as Repository;
+    return Promise.allSettled([new TransactionService(repository).create(provider, creation),new TransactionService(repository).create(provider, second)]);
+  };
+  const exact = await run(creation);
+  assert.deepEqual(exact.map(result => result.status), ["fulfilled", "fulfilled"]);
+  const changed = await run({ ...creation, title: "Changed design" });
+  assert.equal(changed.filter(result => result.status === "fulfilled").length, 1);
+  assert.equal(changed.filter(result => result.status === "rejected").length, 1);
+});
+
+test("exact delivery replay skips pending-evidence validation after the commit", async () => {
+  const { records } = fixtures();
+  let current = structuredClone(records.IN_PROGRESS);
+  let validations = 0;
+  const repository = {
+    getAggregate: async () => structuredClone(current),
+    commit: async (candidate: JobAggregate, expectedVersion: number | null) => {
+      if (expectedVersion === null || current.job.version !== expectedVersion) throw new Error("Concurrent change");
+      current = structuredClone(candidate);
+    },
+  } as unknown as Repository;
+  const service = new TransactionService(repository);
+  const command = { type: "DELIVER" as const, description: "Files", files: [current.job.id + "/evidence"] };
+  const request = requestFor(current);
+  const first = await service.execute(current.job.id, provider, command, request, undefined, async () => { validations++; });
+  const replay = await service.execute(current.job.id, provider, command, request, undefined, async () => { throw new Error("Attached evidence was revalidated"); });
+  assert.equal(first.replayed, false);
+  assert.equal(replay.replayed, true);
+  assert.equal(validations, 1);
+  assert.equal(current.deliveries.length, records.IN_PROGRESS.deliveries.length + 1);
 });

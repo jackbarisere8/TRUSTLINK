@@ -23,16 +23,16 @@ export class RecordedPaymentAdapter implements PaymentProvider {
   async verifyPayment(reference: string): Promise<{
     reference: string;
     mode: PaymentMode;
-    verified: boolean;
+    verificationAvailable: false;
+    verified: false;
     verificationStatus: "NOT_VERIFIED";
-    timestamp: string;
   }> {
     return {
       reference,
       mode: "RECORDED",
+      verificationAvailable: false,
       verified: false,
       verificationStatus: "NOT_VERIFIED",
-      timestamp: new Date().toISOString(),
     };
   }
 }

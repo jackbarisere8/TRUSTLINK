@@ -1,3 +1,5 @@
+import type { PublicTrustEventType } from "../trust-events";
+
 export const jobStatuses = [
   "DRAFT", "SENT", "ACCEPTED", "PAYMENT_RECORDED", "IN_PROGRESS",
   "DELIVERY_SUBMITTED", "REVISION_REQUESTED", "APPROVED", "COMPLETED", "DISPUTED", "CANCELLED",
@@ -99,12 +101,8 @@ export type JobSummaryRecord = Pick<JobRecord,
 export interface PublicJobProjection {
   publicId: string;
   status: JobStatus;
-  sourceChannel: SourceChannel;
   providerLocation: string;
-  createdAt: string;
-  firstViewedAt?: string;
   service: string;
-  serviceCategory: string;
   scope: string;
   deliverables: string[];
   price: string;
@@ -116,11 +114,21 @@ export interface PublicJobProjection {
   provider: {
     username: string;
     displayName: string;
-    avatarUrl?: string;
-    initials: string;
     headline: string;
-    verificationStatus: string;
   };
+}
+
+/** A timeline DTO intentionally strips actors, operation metadata and evidence. */
+export interface PublicTrustEvent {
+  id: string;
+  eventType: PublicTrustEventType;
+  occurredAt: string;
+}
+
+/** The only DTO that anonymous transaction rendering may receive. */
+export interface PublicTransactionProjection {
+  record: PublicJobProjection;
+  events: PublicTrustEvent[];
 }
 
 export interface DeliveryRecord {
@@ -170,11 +178,13 @@ export interface ReviewRecord {
 export interface PaymentRecord {
   id: string;
   jobId: string;
-  paymentMode: "RECORDED";
+  paymentMode: import("../payments/types").RecordedPaymentMode;
+  amount: string;
+  currency: "NGN";
   reference?: string;
   notes?: string;
-  recordedBy: "PROVIDER" | "CLIENT";
-  verificationStatus: "NOT_VERIFIED";
+  recordedBy: import("../payments/types").RecordedPaymentActor;
+  verificationStatus: import("../payments/types").RecordedPaymentVerificationStatus;
   recordedAt: string;
 }
 
@@ -182,10 +192,20 @@ export interface TrustEventRecord {
   id: string;
   jobId: string;
   actorId: string;
-  actorType: "PROVIDER" | "CLIENT_PARTICIPANT" | "ADMIN" | "SYSTEM";
-  eventType: string;
+  actorType: import("../trust-events").TrustEventActorType;
+  eventType: import("../trust-events").TrustEventType;
+  eventSequence: number;
   occurredAt: string;
   metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface NotificationIntentRecord {
+  id: string;
+  jobId: string;
+  eventId: string;
+  notificationKind: import("../notifications").NotificationKind;
+  recipientRole: import("../notifications").NotificationRecipientRole;
   createdAt: string;
 }
 

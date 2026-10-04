@@ -142,3 +142,4 @@ Several career records list specific Nigerian company names as "typical employer
    - ✅ **Source-linked** — URL confirmed active today
    - 📋 **Source-referenced** — publication named but not linked
    - 🔍 **Editorial estimate** — informed range, no external anchor
+

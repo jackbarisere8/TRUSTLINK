@@ -9,5 +9,5 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
   if(!result) notFound();
   const record = await getPublicJobProjection(result.aggregate.job.publicId);
   if(!record) notFound();
-  return <><header className="shell py-5"><Logo/></header><JobWorkspaceView {...result} record={record}/></>;
+  return <><header className="border-b border-[#dbe2e3] bg-white"><div className="shell py-4"><Logo/></div></header><JobWorkspaceView {...result} record={record} mode="dispute"/></>;
 }

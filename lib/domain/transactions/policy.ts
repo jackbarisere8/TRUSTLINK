@@ -1,9 +1,10 @@
 import type { JobStatus } from "../../db/types";
 import type { JobCommand } from "../../validation/schemas";
 import type { Actor } from "../participants";
+import type { TrustEventType } from "../../trust-events";
 
 export type TransactionAction = JobCommand["type"] | "ACCEPT";
-type Rule = { roles: readonly Actor["type"][]; from: readonly JobStatus[]; to: JobStatus | "UNCHANGED" | "OUTCOME"; event: string };
+type Rule = { roles: readonly Actor["type"][]; from: readonly JobStatus[]; to: JobStatus | "UNCHANGED" | "OUTCOME"; event: TrustEventType };
 
 /** Client-safe lifecycle policy shared by the engine and action visibility. No authorization is granted by UI. */
 export const transactionRules: Record<TransactionAction, Rule> = {
@@ -16,9 +17,11 @@ export const transactionRules: Record<TransactionAction, Rule> = {
   COMPLETE: { roles: ["PROVIDER"], from: ["APPROVED"], to: "COMPLETED", event: "JOB_COMPLETED" },
   CANCEL: { roles: ["PROVIDER"], from: ["DRAFT", "SENT"], to: "CANCELLED", event: "JOB_CANCELLED" },
   DISPUTE: { roles: ["PROVIDER", "CLIENT_PARTICIPANT"], from: ["ACCEPTED", "PAYMENT_RECORDED", "IN_PROGRESS", "DELIVERY_SUBMITTED", "REVISION_REQUESTED", "APPROVED"], to: "DISPUTED", event: "DISPUTE_OPENED" },
+  RESPOND_DISPUTE: { roles: ["PROVIDER", "CLIENT_PARTICIPANT"], from: ["DISPUTED"], to: "UNCHANGED", event: "DISPUTE_RESPONDED" },
   RESOLVE: { roles: ["ADMIN"], from: ["DISPUTED"], to: "OUTCOME", event: "DISPUTE_RESOLVED" },
   REVIEW: { roles: ["CLIENT_PARTICIPANT"], from: ["COMPLETED"], to: "UNCHANGED", event: "CLIENT_REVIEWED" },
   ROTATE_INVITE: { roles: ["PROVIDER"], from: ["SENT", "ACCEPTED", "PAYMENT_RECORDED", "IN_PROGRESS", "DELIVERY_SUBMITTED", "REVISION_REQUESTED", "APPROVED", "COMPLETED", "DISPUTED"], to: "UNCHANGED", event: "CLIENT_LINK_REISSUED" },
+  REVOKE_INVITE: { roles: ["PROVIDER"], from: ["SENT", "ACCEPTED", "PAYMENT_RECORDED", "IN_PROGRESS", "DELIVERY_SUBMITTED", "REVISION_REQUESTED", "APPROVED", "COMPLETED", "DISPUTED"], to: "UNCHANGED", event: "CLIENT_LINK_REVOKED" },
 };
 
 export function isActionAvailable(status: JobStatus, actor: Actor["type"], action: TransactionAction) {

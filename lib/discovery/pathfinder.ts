@@ -210,7 +210,7 @@ export function calculatePathfinderRecommendations(
 
     recommendations.push({
       career,
-      matchScore: score,
+      matchScore: Math.min(score, 98),
       matchTier,
       matchReasons: reasons.length > 0 ? reasons : ["Provides a viable pathway based on your preferences."],
       recommendedFirstStep: firstStep,

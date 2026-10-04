@@ -1,240 +1,33 @@
-
+import Link from "next/link";
 import { Navbar } from "@/components/navigation/navbar";
 import { Footer } from "@/components/navigation/footer";
 import { Button } from "@/components/ui/button";
+import { HeroRecord } from "@/components/home/hero-record";
 
 export const metadata = {
-  title: "TrustLink for Independent Nigerian Providers",
-  description:
-    "Stop scope creep, endless unpaid revisions, and forgotten terms. TrustLink gives Nigerian designers, developers, and creators a professional transaction agreement.",
+  title: "TrustLink for independent providers",
+  description: "Record service terms, send a client link, and keep delivery and revisions connected to the agreement.",
 };
 
-const PAIN_POINTS = [
-  {
-    problem: "Scope Creep",
-    story:
-      '"Can you just quickly add an e-commerce store and a mobile app to that static landing page we agreed on?"',
-    solution:
-      "Your TrustLink terms explicitly itemize deliverables. Anything outside the written scope is an add-on, not a favor.",
-  },
-  {
-    problem: "Endless Revision Loops",
-    story:
-      '"We changed our mind again. Let us try five different color palettes and new fonts."',
-    solution:
-      "Specify 1, 2, or 3 revision rounds upfront. When included rounds are exhausted, additional work requires a formal update.",
-  },
-  {
-    problem: "Disputed Delivery Dates",
-    story:
-      '"You delivered late! We expected this last Monday!"',
-    solution:
-      "Agreed deadline and actual submission timestamps are logged permanently on the job record with exact dates.",
-  },
-  {
-    problem: "Invisible Reputation",
-    story:
-      'Doing brilliant work for clients who never leave a review or endorse you anywhere visible.',
-    solution:
-      "Every completed TrustLink job adds to your public Trust Profile — transaction history that new clients can inspect instantly.",
-  },
+const moments = [
+  ["Before work", "Put the service, deliverables, fee, deadline, included revisions and cancellation terms into one record."],
+  ["At acceptance", "Send a private participant link so your client can review the terms and accept them explicitly."],
+  ["During delivery", "Submit the work against the agreed scope. Keep revision requests and supporting files with the transaction."],
+  ["After completion", "Completed work can appear in your Trust Profile with any client feedback left on that record."],
 ];
 
-const USE_CASES = [
-  {
-    role: "Web & Mobile Developers",
-    typicalDeal: "₦250,000 – ₦1,200,000",
-    deliverables: "Responsive frontend, API integration, testing, 14-day bug fix window",
-    advantage: "Stops clients from demanding new features before releasing final milestone balance.",
-  },
-  {
-    role: "Brand & UI/UX Designers",
-    typicalDeal: "₦120,000 – ₦600,000",
-    deliverables: "Logo package, brand guidelines, Figma source files, 2 revision rounds",
-    advantage: "Strict revision boundary prevents infinite rework and subjective redesign loops.",
-  },
-  {
-    role: "Photographers & Videographers",
-    typicalDeal: "₦150,000 – ₦850,000",
-    deliverables: "Half-day shoot, 30 edited stills, 60-second highlight reel in 4K",
-    advantage: "Clarifies exactly what raw files or edited assets are included in the quoted fee.",
-  },
-  {
-    role: "Digital Marketers & Copywriters",
-    typicalDeal: "₦80,000 – ₦450,000",
-    deliverables: "Monthly content calendar, 12 graphics, copy deck, ad campaign setup",
-    advantage: "Documents campaign parameters and review turnaround times unambiguously.",
-  },
+const examples = [
+  ["Website project", "Pages, responsive behavior, handoff files and included revisions."],
+  ["Brand identity", "Logo package, source files, usage guide and review rounds."],
+  ["Photo or video work", "Coverage, edited outputs, formats and delivery date."],
+  ["Campaign work", "Content schedule, deliverables, review window and reporting scope."],
 ];
 
 export default function ForProvidersPage() {
-  return (
-    <>
-      <Navbar />
-      <main id="main-content">
-        {/* Hero */}
-        <section className="bg-navy-900 text-white py-18 md:py-28">
-          <div className="shell grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7 space-y-6">
-              <p className="text-teal-400 text-xs font-bold ">
-                Built for Independent Professionals
-              </p>
-              <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-balance">
-                Do the work you love.{" "}
-                <em className="not-italic text-teal-400">Lock the terms you agreed.</em>
-              </h1>
-              <p className="text-surface-300 text-lg leading-relaxed max-w-xl">
-                TrustLink gives Nigerian freelancers, agencies, and independent creators
-                a clean, professional agreement to share with clients on WhatsApp, Instagram,
-                or email.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                <Button href="/signup" variant="secondary" size="lg" className="text-white font-semibold">
-                  Create your provider profile →
-                </Button>
-                <Button
-                  href="/j/sample-website-project"
-                  variant="outline"
-                  size="lg"
-                  className="border-navy-700 text-surface-300 hover:border-navy-600 hover:text-white hover:bg-navy-800 font-semibold"
-                >
-                  Preview a sample job link
-                </Button>
-              </div>
-            </div>
-
-            {/* Quick stats / summary card */}
-            <div className="lg:col-span-5">
-              <div className="bg-navy-800 border border-navy-700 rounded-xl p-8 space-y-6">
-                <h3 className="text-xs font-bold  text-teal-400">
-                  What every TrustLink includes
-                </h3>
-                <div className="space-y-4 text-sm text-surface-300">
-                  <div className="flex items-start gap-3">
-                    <span className="text-teal-400 font-bold">01</span>
-                    <div>
-                      <strong className="text-white block">Itemized Deliverables</strong>
-                      <span>Specific scope checklist so clients know what is and isn’t included.</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-teal-400 font-bold">02</span>
-                    <div>
-                      <strong className="text-white block">Revision Cap</strong>
-                      <span>Lock the number of revisions to prevent endless iterations.</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-teal-400 font-bold">03</span>
-                    <div>
-                      <strong className="text-white block">Delivery evidence</strong>
-                      <span>Submit files and links directly to the job ledger.</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-teal-400 font-bold">04</span>
-                    <div>
-                      <strong className="text-white block">Shareable Trust Profile</strong>
-                      <span>A single link to prove your track record to every future client.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* The 4 Common Problems */}
-        <section className="section bg-surface-50">
-          <div className="shell">
-            <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
-              <p className="eyebrow">The Freelance Reality</p>
-              <h2 className="font-sans text-3xl sm:text-4xl text-navy-900 font-normal tracking-tight">
-                Problems TrustLink eliminates before they happen
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {PAIN_POINTS.map((item) => (
-                <div
-                  key={item.problem}
-                  className="bg-white border border-surface-200 rounded-xl p-6 md:p-8 space-y-4"
-                >
-                  <span className="inline-block px-2.5 py-1 bg-danger-light text-danger-text text-xs font-bold rounded">
-                    Problem: {item.problem}
-                  </span>
-                  <blockquote className="text-sm italic text-surface-500 border-l-2 border-danger pl-3 my-2">
-                    {item.story}
-                  </blockquote>
-                  <div className="pt-2 border-t border-surface-100">
-                    <p className="text-xs font-bold text-teal-700 uppercase tracking-wide mb-1">
-                      How TrustLink fixes this:
-                    </p>
-                    <p className="text-sm text-surface-600 leading-relaxed">
-                      {item.solution}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Real Service Scenarios */}
-        <section className="section bg-white border-t border-surface-200">
-          <div className="shell">
-            <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
-              <p className="eyebrow">Built For Your Industry</p>
-              <h2 className="font-sans text-3xl sm:text-4xl text-navy-900 font-normal tracking-tight">
-                How Nigerian creators structure their jobs
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-              {USE_CASES.map((uc) => (
-                <div
-                  key={uc.role}
-                  className="border border-surface-200 rounded-xl p-6 space-y-4 hover:border-teal-500 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-navy-900">{uc.role}</h3>
-                    <span className="text-xs font-semibold text-teal-700 bg-teal-50 px-2.5 py-1 rounded border border-teal-200">
-                      {uc.typicalDeal}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-2xs font-bold text-surface-400  mb-1">
-                      Deliverables Example
-                    </p>
-                    <p className="text-sm text-surface-700">{uc.deliverables}</p>
-                  </div>
-                  <div className="pt-2 border-t border-surface-100">
-                    <p className="text-xs text-surface-500">
-                      <strong className="text-navy-900">Why it works:</strong> {uc.advantage}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA */}
-        <section className="py-20 bg-teal-600 text-white text-center">
-          <div className="shell max-w-xl mx-auto space-y-6">
-            <h2 className="font-sans text-3xl sm:text-4xl font-normal text-balance">
-              Never start another client project without a TrustLink.
-            </h2>
-            <p className="text-teal-100 text-base">
-              Set up your free provider profile in 2 minutes. Start sharing links today.
-            </p>
-            <Button href="/signup" variant="primary" size="lg" className="bg-navy-900 hover:bg-navy-800 text-white font-semibold">
-              Get started free →
-            </Button>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </>
-  );
+  return <><Navbar/><main id="main-content">
+    <section className="border-b border-[#dbe2e3] bg-[#f4f6f3] py-16 sm:py-22 lg:py-26"><div className="shell grid items-center gap-12 lg:grid-cols-[.88fr_1.12fr] lg:gap-20"><div><p className="eyebrow">For service providers</p><h1 className="page-heading mt-5 text-[3.1rem] sm:text-[4.2rem] text-balance">Start the work with the terms in view.</h1><p className="mt-6 max-w-lg text-base leading-8 text-surface-700">When you and a client agree in a conversation, give that agreement a place of its own. Record the scope, price and deadline before delivery begins.</p><div className="mt-8 flex flex-wrap gap-4"><Button href="/signup" size="lg">Create a TrustLink</Button><Link href="/#preview" className="quiet-link self-center py-3 text-sm font-semibold">Try an example record →</Link></div></div><div><p className="mb-3 text-xs text-surface-600">Illustrative transaction record</p><HeroRecord/></div></div></section>
+    <section className="section border-b border-[#dbe2e3] bg-white"><div className="shell grid gap-12 lg:grid-cols-[.7fr_1.3fr] lg:gap-20"><div><p className="eyebrow">One record, through the work</p><h2 className="interface-heading mt-4 text-[2.4rem] sm:text-[3rem]">The agreement stays useful after it is signed.</h2></div><ol className="border-t border-[#dbe2e3]">{moments.map(([title, body], index) => <li key={title} className="grid gap-3 border-b border-[#dbe2e3] py-6 sm:grid-cols-[2rem_10rem_1fr] sm:gap-5"><span className="font-mono text-xs text-surface-500">{String(index + 1).padStart(2, "0")}</span><h3 className="font-semibold">{title}</h3><p className="text-sm leading-7 text-surface-700">{body}</p></li>)}</ol></div></section>
+    <section className="section border-b border-[#dbe2e3] bg-[#f4f6f3]"><div className="shell"><p className="eyebrow">Make scope concrete</p><h2 className="interface-heading mt-4 max-w-2xl text-[2.4rem] sm:text-[3rem]">Different services. The same need for clear deliverables.</h2><div className="mt-11 grid gap-x-10 border-t border-[#cbd6d9] md:grid-cols-2">{examples.map(([title, body]) => <div key={title} className="border-b border-[#cbd6d9] py-6"><h3 className="font-semibold">{title}</h3><p className="mt-2 max-w-md text-sm leading-7 text-surface-700">{body}</p></div>)}</div><p className="mt-6 text-xs leading-6 text-surface-600">These are illustrative scopes, not prescribed prices or promises of a result.</p></div></section>
+    <section className="section bg-navy-900 text-white"><div className="shell flex flex-col items-start justify-between gap-8 md:flex-row md:items-center"><div><p className="eyebrow !text-[#a9c6c7]">A clear starting point</p><h2 className="interface-heading mt-4 text-[2.4rem] sm:text-[3rem]">Write down what you agreed.</h2><p className="mt-4 max-w-lg text-sm leading-7 text-surface-300">TrustLink records direct payment declarations; it does not hold funds or verify transfers independently.</p></div><Button href="/signup" size="lg" className="bg-white text-navy-900 hover:bg-surface-100">Create a TrustLink →</Button></div></section>
+  </main><Footer/></>;
 }

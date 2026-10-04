@@ -254,3 +254,4 @@ CREATE POLICY "Public select trust events" ON public.trust_events FOR SELECT USI
 CREATE POLICY "Users can insert jobs" ON public.jobs FOR INSERT WITH CHECK (true);
 CREATE POLICY "Users can insert job terms" ON public.job_terms FOR INSERT WITH CHECK (true);
 CREATE POLICY "Users can insert trust events" ON public.trust_events FOR INSERT WITH CHECK (true);
+

@@ -1,4 +1,4 @@
-import type { ApplicationProfileRecord, ProviderProfileRecord, JobSummaryRecord, JobRecord, JobTermsRecord, PaymentRecord, DeliveryRecord, RevisionRecord, DisputeRecord, ReviewRecord, TrustEventRecord } from "./types";
+import type { ApplicationProfileRecord, ProviderProfileRecord, JobSummaryRecord, JobRecord, JobTermsRecord, PaymentRecord, DeliveryRecord, RevisionRecord, DisputeRecord, ReviewRecord, TrustEventRecord, PublicTransactionProjection, NotificationIntentRecord } from "./types";
 
 export interface JobAggregate {
   job: JobRecord;
@@ -17,10 +17,14 @@ export interface Repository {
   getProfileByUserId(userId: string): Promise<ApplicationProfileRecord | null>;
   updateProfile(userId: string, input: ProfileInput): Promise<void>;
   getAggregate(id: string, byPublicId?: boolean): Promise<JobAggregate | null>;
+  /** Narrow public record plus allowlisted, redacted lifecycle history. */
+  getPublicTransaction(publicId: string): Promise<PublicTransactionProjection | null>;
   listJobs(providerId?: string): Promise<JobSummaryRecord[]>;
   listProfiles(): Promise<ApplicationProfileRecord[]>;
   listDisputes(): Promise<DisputeRecord[]>;
   listEvents(): Promise<TrustEventRecord[]>;
+  /** Durable transactional intents produced only from immutable trust events. */
+  listNotificationIntents(jobId?: string): Promise<NotificationIntentRecord[]>;
   /** Atomic compare-and-swap. A conflict must leave both state and events unchanged. */
   commit(aggregate: JobAggregate, expectedVersion: number | null): Promise<void>;
 }

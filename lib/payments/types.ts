@@ -4,6 +4,16 @@
 
 export type PaymentMode = "PROTECTED" | "AUTHORIZED" | "RECORDED";
 
+export const recordedPaymentSemantics = {
+  paymentMode: "RECORDED",
+  recordedBy: "PROVIDER",
+  verificationStatus: "NOT_VERIFIED",
+} as const;
+
+export type RecordedPaymentMode = typeof recordedPaymentSemantics.paymentMode;
+export type RecordedPaymentActor = typeof recordedPaymentSemantics.recordedBy;
+export type RecordedPaymentVerificationStatus = typeof recordedPaymentSemantics.verificationStatus;
+
 export interface PaymentCapabilities {
   protectedFunds: boolean;
   authorization: boolean;

@@ -117,6 +117,7 @@ test("domain service persists a full local lifecycle, profile changes, retries a
   assert.ok(created.token);
   assert.equal(created.aggregate.job.providerLocation, "Ikeja, Lagos, Nigeria");
   assert.equal((await service().create(provider, creation)).token, undefined);
+  await assert.rejects(service().create(provider, { ...creation, title: "Changed title" }), /different transaction details/);
   await assert.rejects(service().create({ ...provider, id: "other" }, creation), /cannot be reused/);
   await assert.rejects(service().create(provider, { ...creation, creationId: randomUUID() }), /repeat transaction/);
   await assert.rejects(service().accept(created.aggregate.job.publicId, "bad", { name: "Client", email: "client@example.test", confirmed: true }, { id: randomUUID(), expectedVersion: 0 }), /expired/);
@@ -136,6 +137,14 @@ test("domain service persists a full local lifecycle, profile changes, retries a
   assert.equal(persisted.terms.revisionsUsed, 1);
   assert.equal(persisted.reviews.length, 1);
   assert.equal(persisted.payments[0].verificationStatus, "NOT_VERIFIED");
+  const publicTransaction = await new LocalStoreRepository(file).getPublicTransaction(current.job.publicId);
+  assert.equal(publicTransaction?.record.service, "Website");
+  assert.equal(publicTransaction?.record.provider.displayName, "Test provider");
+  assert.deepEqual(publicTransaction?.events.map(event => event.eventType), ["JOB_CREATED","JOB_SENT","JOB_ACCEPTED","PAYMENT_RECORDED","WORK_STARTED","DELIVERY_SUBMITTED","REVISION_REQUESTED","WORK_STARTED","DELIVERY_SUBMITTED","DELIVERY_APPROVED","JOB_COMPLETED","CLIENT_REVIEWED"]);
+  const publicSerialized = JSON.stringify(publicTransaction);
+  assert.ok(!publicSerialized.includes("client@example.test"));
+  assert.ok(!publicSerialized.includes(current.job.clientActionTokenHash!));
+  assert.ok(!publicSerialized.includes("actorId"));
   await updateProviderProfile(repo, provider.id, { displayName: "Updated provider", country: "Nigeria", state: "Oyo", city: "Ibadan", headline: "Web designer", bio: "Test biography", serviceArea: "Nigeria" });
   const profile = await new LocalStoreRepository(file).getProfileByUsername("test-provider");
   assert.equal(profile?.profile.city, "Ibadan");

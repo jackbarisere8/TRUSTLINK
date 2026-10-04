@@ -1,7 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { resolveAuthConfiguration } from "@/lib/auth/config";
+import brandIcon from "@/app/icon.png";
 export async function proxy(request: NextRequest) {
+  // A legacy public/icon.png still exists. Route Next's automatic icon URL to
+  // the selected app icon so the browser tab and shared LogoMark agree.
+  if (request.nextUrl.pathname === "/icon.png") {
+    return NextResponse.rewrite(new URL(brandIcon.src, request.url));
+  }
   let response = NextResponse.next({ request });
   const configuration = resolveAuthConfiguration(process.env);
   if (configuration.mode === "supabase") {
@@ -19,4 +25,4 @@ export async function proxy(request: NextRequest) {
   response.headers.set("Referrer-Policy", "no-referrer");
   return response;
 }
-export const config = { matcher: ["/dashboard/:path*", "/admin/:path*", "/disputes/:path*", "/j/:path*", "/login", "/signup", "/auth/:path*", "/api/evidence/:path*"] };
+export const config = { matcher: ["/icon.png", "/dashboard/:path*", "/admin/:path*", "/disputes/:path*", "/j/:path*", "/login", "/signup", "/auth/:path*", "/api/evidence/:path*"] };

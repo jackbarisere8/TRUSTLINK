@@ -10,7 +10,7 @@ export default function NotFound() {
 
       <main id="main-content" className="flex-1 flex items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <p className="text-teal-600 text-xs font-bold  mb-4">
+          <p className="text-surface-600 text-xs font-bold  mb-4">
             404
           </p>
           <h1 className="font-sans text-4xl md:text-5xl font-normal text-navy-900 tracking-tight mb-4">

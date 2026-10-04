@@ -44,8 +44,8 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50 flex flex-col justify-between">
-      <header className="shell py-6 flex items-center justify-between">
+    <div className="min-h-screen bg-[#f4f6f3] flex flex-col justify-between">
+      <header className="shell py-6 flex items-center justify-between border-b border-[#dbe2e3]">
         <Logo variant="full" size="md" />
         <Link
           href="/"
@@ -55,20 +55,22 @@ export default function SignupPage() {
         </Link>
       </header>
 
-      <main id="main-content" className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md bg-white border border-surface-200 rounded-xl p-8 sm:p-10 space-y-6">
-          <div className="space-y-1 text-center">
-            <h1 className="font-sans text-3xl font-normal text-navy-900">
+      <main id="main-content" className="shell flex-1 grid items-center gap-12 py-10 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:py-16">
+        <div className="hidden lg:block max-w-lg"><p className="eyebrow">Begin with clear terms</p><p className="page-heading mt-5 text-[3.7rem]">Make the agreement easier to keep.</p><p className="mt-6 max-w-md leading-8 text-surface-700">Put scope, fee, deadline and revisions into one record your client can review before work begins.</p><div className="mt-12 border-t border-[#cbd6d9] pt-5 text-sm text-surface-600">Record · Share · Deliver</div></div>
+        <div className="auth-panel w-full max-w-md justify-self-center space-y-6 p-7 sm:p-10">
+          <div className="space-y-2 text-left">
+            <p className="eyebrow">Create an account</p>
+            <h1 className="text-3xl font-semibold text-navy-900">
               Create your TrustLink
             </h1>
             <p className="text-sm text-surface-500">
-              Start formalizing service deals with clear terms in minutes
+              Create your first transaction record after sign up.
             </p>
           </div>
 
           {message && <p role="status" className="notice">{message}</p>}
           {error && (
-            <div className="p-3 bg-danger-light border border-red-200 rounded-lg text-xs font-medium text-danger-text" role="alert">
+            <div className="p-3 bg-danger-light border border-red-200 text-xs font-medium text-danger-text" role="alert">
               {error}
             </div>
           )}
@@ -124,7 +126,7 @@ export default function SignupPage() {
             </Button>
           </form>
 
-          <div className="text-center pt-2 border-t border-surface-100">
+          <div className="pt-5 border-t border-surface-200">
             <p className="text-xs text-surface-500">
               Already have an account?{" "}
               <Link href="/login" className="text-teal-600 hover:text-teal-700 font-semibold">

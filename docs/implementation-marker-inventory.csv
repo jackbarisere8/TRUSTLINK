@@ -22,16 +22,21 @@ app/j/[publicId]/page.tsx,23,example | sample,DEMO-ONLY,Explicitly labeled illus
 app/j/[publicId]/page.tsx,24,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 app/login/page.tsx,74,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
 app/login/page.tsx,84,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
-app/p/[username]/page.tsx,11,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
-app/p/[username]/page.tsx,12,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
-app/p/[username]/page.tsx,13,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 app/p/[username]/page.tsx,14,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
-app/p/[username]/page.tsx,15,example | sample,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
-app/p/[username]/page.tsx,17,Example | example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,15,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,16,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,17,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 app/p/[username]/page.tsx,18,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
-app/p/[username]/page.tsx,21,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,19,example | sample,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,20,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,22,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 app/p/[username]/page.tsx,23,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 app/p/[username]/page.tsx,24,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,25,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,28,Example | example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,29,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,35,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
+app/p/[username]/page.tsx,36,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 app/page.tsx,13,example | sample,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 app/page.tsx,23,Example | example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 app/signup/page.tsx,80,placeholder,REAL,Input hint or placeholder CSS utility; not a backend substitute.
@@ -171,7 +176,6 @@ docs/trustlink-psp-interview-script-v2.md,538,Protected funds,REAL,Documentation
 docs/trustlink-psp-interview-script-v2.md,544,protected funds,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
 empty.md,1,placeholder,REAL,Documentation/planning/audit text; not evidence that the described feature exists.
 lib/examples.ts,3,sample,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
-lib/notifications/index.ts,1,STUB,REPLACE,"Empty, unused notification module; later phase must define minimal real event-based behavior."
 lib/opportunities/index.ts,74,SAMPLE,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 lib/opportunities/index.ts,114,example,DEMO-ONLY,Explicitly labeled illustrative content; isolated from real transaction mutation.
 lib/utils.ts,13,Example,REAL,"Implementation text, field hint, negative disclosure or explanatory comment; not simulated persistence."

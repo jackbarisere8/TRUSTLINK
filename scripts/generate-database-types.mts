@@ -9,6 +9,18 @@ const migrations = [
   "supabase/migrations/20260920000001_final_audit.sql",
   "supabase/migrations/20260921000000_database_model.sql",
   "supabase/migrations/20260921000001_database_security.sql",
+  "supabase/migrations/20260921000002_trust_event_ledger.sql",
+  "supabase/migrations/20260921000003_payment_semantics.sql",
+  "supabase/migrations/20260922000000_real_job_creation.sql",
+  "supabase/migrations/20260922000001_public_transaction_projection.sql",
+  "supabase/migrations/20260922000002_secure_client_capabilities.sql",
+  "supabase/migrations/20260922000003_client_acceptance.sql",
+  "supabase/migrations/20260924000000_work_delivery_revisions.sql",
+  "supabase/migrations/20260924000001_evidence_storage.sql",
+  "supabase/migrations/20260926000000_disputes.sql",
+  "supabase/migrations/20260926000001_reviews_trust_profile.sql",
+  "supabase/migrations/20260927000000_transaction_notifications.sql",
+  "supabase/migrations/20260927000001_validation_analytics.sql",
 ];
 
 type Column = {

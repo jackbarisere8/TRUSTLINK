@@ -1,6 +1,6 @@
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { JobAggregate } from "../../db/repository";
-import { participantDetailStatuses, type JobRecord, type ParticipantDetailStatus } from "../../db/types";
+import type { JobRecord, ParticipantDetailStatus } from "../../db/types";
 import { DomainError } from "../errors";
 export type Actor = { id: string; type: "PROVIDER" | "CLIENT_PARTICIPANT" | "ADMIN"; name: string };
 
@@ -15,15 +15,16 @@ export type TransactionParticipant = {
   detailStatus: ParticipantDetailStatus;
 };
 
-function isParticipantDetailStatus(value: unknown): value is ParticipantDetailStatus {
-  return typeof value === "string" && participantDetailStatuses.some(status => status === value);
-}
-
 export function clientParticipantDetailStatus(a: JobAggregate): ParticipantDetailStatus {
   if (!a.job.clientTokenUsed) return "UNKNOWN";
   const acceptance = [...a.events].reverse().find(event => event.eventType === "JOB_ACCEPTED");
-  const value = acceptance?.metadata.participantDetailStatus ?? acceptance?.metadata.identityStatus;
-  return isParticipantDetailStatus(value) ? value : "UNKNOWN";
+  const current = acceptance?.metadata.participantDetailStatus;
+  const legacy = acceptance?.metadata.identityStatus;
+  // An acceptance records details supplied by the participant. No acceptance
+  // metadata can turn those details into a verification claim.
+  return current === "SELF_PROVIDED" || (current === undefined && legacy === "SELF_PROVIDED")
+    ? "SELF_PROVIDED"
+    : "UNKNOWN";
 }
 
 export function transactionParticipants(
@@ -55,8 +56,22 @@ export function transactionParticipants(
 
 export const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
 export const newToken = () => randomBytes(32).toString("hex");
-export function validCapability(job: JobRecord, token: string, now = Date.now()) {
-  if (!/^[a-f0-9]{64}$/.test(token) || !job.clientActionTokenHash || !job.clientTokenExpiresAt || !Number.isFinite(Date.parse(job.clientTokenExpiresAt)) || Date.parse(job.clientTokenExpiresAt) <= now) return false;
+export const clientCapabilityLifetimeMs = 30 * 24 * 60 * 60 * 1000;
+export const clientCapabilityExpiresAt = (now = Date.now()) => new Date(now + clientCapabilityLifetimeMs).toISOString();
+
+/** A stored capability is either complete or absent after explicit revocation. */
+export function hasStoredClientCapability(job: Pick<JobRecord, "clientActionTokenHash" | "clientTokenExpiresAt">): job is Pick<JobRecord, "clientActionTokenHash" | "clientTokenExpiresAt"> & { clientActionTokenHash: string; clientTokenExpiresAt: string } {
+  return typeof job.clientActionTokenHash === "string" && /^[a-f0-9]{64}$/.test(job.clientActionTokenHash) &&
+    typeof job.clientTokenExpiresAt === "string" && Number.isFinite(Date.parse(job.clientTokenExpiresAt));
+}
+
+/** A complete capability is actionable only until its stored expiry. */
+export function hasActiveStoredClientCapability(job: Pick<JobRecord, "clientActionTokenHash" | "clientTokenExpiresAt">, now = Date.now()): job is Pick<JobRecord, "clientActionTokenHash" | "clientTokenExpiresAt"> & { clientActionTokenHash: string; clientTokenExpiresAt: string } {
+  return hasStoredClientCapability(job) && Date.parse(job.clientTokenExpiresAt) > now;
+}
+
+export function validCapability(job: JobRecord, token: unknown, now = Date.now()) {
+  if (typeof token !== "string" || !/^[a-f0-9]{64}$/.test(token) || !hasActiveStoredClientCapability(job, now)) return false;
   const stored = Buffer.from(job.clientActionTokenHash, "hex");
   const incoming = Buffer.from(hashToken(token), "hex");
   return stored.length === incoming.length && timingSafeEqual(stored, incoming);

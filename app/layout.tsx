@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import brandIcon from "./icon.png";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -33,10 +34,8 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-NG">
-      <head>
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-      </head>
-      <body className="min-h-screen bg-surface-50 text-navy-900 antialiased">
+      <head><link rel="icon" href={brandIcon.src} sizes="1254x1254" type="image/png" /></head>
+      <body className="min-h-screen bg-[#f7f8f6] text-navy-900 antialiased">
         <a href="#main-content" className="skip-link">Skip to content</a>
         {children}
       </body>

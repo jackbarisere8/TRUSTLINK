@@ -13,7 +13,7 @@ Creation publishes directly to `SENT`; `DRAFT` remains reserved. The current mod
 | Action | Actor | From | To / event |
 |---|---|---|---|
 | Accept | Client capability | `SENT` | `ACCEPTED` / `JOB_ACCEPTED` |
-| Record payment | Provider | `ACCEPTED` | `PAYMENT_RECORDED` / `PAYMENT_RECORDED` |
+| Record payment received | Provider | `ACCEPTED` | `PAYMENT_RECORDED` / `PAYMENT_RECORDED` |
 | Start work | Provider | `PAYMENT_RECORDED`, `REVISION_REQUESTED` | `IN_PROGRESS` / `WORK_STARTED` |
 | Submit delivery | Provider | `IN_PROGRESS` | `DELIVERY_SUBMITTED` / `DELIVERY_SUBMITTED` |
 | Request revision | Client capability | `DELIVERY_SUBMITTED` | `REVISION_REQUESTED` / `REVISION_REQUESTED` |
@@ -21,8 +21,9 @@ Creation publishes directly to `SENT`; `DRAFT` remains reserved. The current mod
 | Complete | Provider | `APPROVED` | `COMPLETED` / `JOB_COMPLETED` |
 | Cancel | Provider | `DRAFT`, `SENT` | `CANCELLED` / `JOB_CANCELLED` |
 | Open dispute | Either participant | Accepted active states | `DISPUTED` / `DISPUTE_OPENED` |
+| Respond to dispute | Other transaction party | `DISPUTED` with `OPEN` dispute | `DISPUTED` / `DISPUTE_RESPONDED` |
 | Resolve dispute | Admin | `DISPUTED` | Explicit `IN_PROGRESS` or `CANCELLED` / `DISPUTE_RESOLVED` |
-| Review | Client capability | `COMPLETED` | State unchanged / `CLIENT_REVIEWED` |
+| Review | Client capability | `COMPLETED`, no existing review | State unchanged / `CLIENT_REVIEWED` with exact review ID and rating |
 | Replace link | Provider | Published, non-cancelled states except `DRAFT` | State unchanged / `CLIENT_LINK_REISSUED` |
 
 Resuming a dispute as `IN_PROGRESS` still requires a recorded payment. Revision requests still enforce the agreed revision limit. A payment remains a provider report with `NOT_VERIFIED`; this phase adds no custody or transfer verification.

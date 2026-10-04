@@ -125,3 +125,4 @@ The architectural decision to add `age_status = VERIFIED | SELF_DECLARED | UNKNO
 - An explicit declaration that the platform relies on self-declaration only and assumes no responsibility for age misrepresentation
 
 **For V0.1: Self-declaration with explicit user acknowledgement is the correct and honest approach.**
+
