@@ -19,6 +19,7 @@ export type SourceChannel =
   | "SMS"
   | "Email"
   | "QR Code"
+  | "TrustLink Marketplace"
   | "Other";
 
 export interface ApplicationProfileRecord {
@@ -40,7 +41,15 @@ export interface ProviderProfileRecord {
   bio?: string;
   serviceArea: string;
   verificationStatus: "UNVERIFIED" | "IDENTITY_PROVIDED" | "VERIFIED_BY_TRUSTLINK";
+  marketplaceStatus: "NOT_LISTED" | "DRAFT" | "PUBLISHED" | "SUSPENDED";
+  businessName?: string;
+  remoteServices: boolean;
+  bookingPolicy?: string;
+  moderationStatus: "DRAFT" | "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
+  publishedAt?: string;
+  bookingCapacity: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 export const participantDetailStatuses = [

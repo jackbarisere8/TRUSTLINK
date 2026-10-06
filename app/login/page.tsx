@@ -1,18 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Logo } from "@/components/branding/logo";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { loginAction } from "@/app/actions/auth";
 
+function AccountNotice() {
+  const params = useSearchParams();
+  const confirmation = params.get("confirmation");
+  const recovery = params.get("recovery");
+  const message = confirmation === "failed"
+    ? "We couldn't confirm that email. The link may be invalid, expired, or already used. Sign in if the account is already confirmed, or create the account again to request a new confirmation email."
+    : confirmation === "limited"
+      ? "Too many confirmation attempts were made. Wait a few minutes before opening the link again."
+      : recovery === "failed"
+        ? "That password reset link is invalid or expired. Request a new reset link."
+        : recovery === "limited"
+          ? "Too many password reset attempts were made. Wait a few minutes and request a new link."
+          : recovery === "updated"
+            ? "Your password was changed. Sign in with the new password."
+            : null;
+  if (!message) return null;
+  const success = recovery === "updated";
+  return <p role={success ? "status" : "alert"} className={success ? "notice" : "p-3 bg-danger-light border border-red-200 text-xs font-medium text-danger-text"}>{message}</p>;
+}
+
 export default function LoginPage() {
+  const [returnTo, setReturnTo] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setReturnTo(new URLSearchParams(window.location.search).get("returnTo") || "");
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +52,7 @@ export default function LoginPage() {
     const formData = new FormData();
     formData.append("email", email);
     formData.append("password", password);
+    if (returnTo) formData.append("returnTo", returnTo);
 
     try {
       const result = await loginAction(formData);
@@ -62,6 +89,8 @@ export default function LoginPage() {
             </p>
           </div>
 
+          <Suspense fallback={null}><AccountNotice /></Suspense>
+
           {error && (
             <div className="p-3 bg-danger-light border border-red-200 text-xs font-medium text-danger-text" role="alert">
               {error}
@@ -83,11 +112,17 @@ export default function LoginPage() {
               <Input
                 label="Password"
                 type="password"
+                autoComplete="current-password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <div className="text-right">
+                <Link href="/forgot-password" className="text-xs font-semibold text-teal-700 hover:text-teal-800">
+                  Forgot your password?
+                </Link>
+              </div>
             </div>
 
             <Button
@@ -104,7 +139,7 @@ export default function LoginPage() {
           <div className="pt-5 border-t border-surface-200">
             <p className="text-xs text-surface-500">
               Don&apos;t have an account yet?{" "}
-              <Link href="/signup" className="text-teal-600 hover:text-teal-700 font-semibold">
+              <Link href={returnTo ? `/signup?returnTo=${encodeURIComponent(returnTo)}` : "/signup"} className="text-teal-600 hover:text-teal-700 font-semibold">
                 Create a TrustLink account
               </Link>
             </p>

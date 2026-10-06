@@ -1,7 +1,7 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Repository, JobAggregate, ProfileBundle, ProfileInput } from "./repository";
-import { jobStatuses, type ApplicationProfileRecord, type DisputeRecord, type JobStatus, type JobSummaryRecord, type JobTermsRecord, type NotificationIntentRecord, type PublicJobProjection, type PublicTransactionProjection, type PublicTrustEvent, type TrustEventRecord } from "./types";
+import type { Repository, JobAggregate, ProfileBundle, ProfileInput, AccountProfileInput, ProviderOnboardingInput } from "./repository";
+import { jobStatuses, type ApplicationProfileRecord, type DisputeRecord, type JobStatus, type JobSummaryRecord, type JobTermsRecord, type NotificationIntentRecord, type ProviderProfileRecord, type PublicJobProjection, type PublicTransactionProjection, type PublicTrustEvent, type TrustEventRecord } from "./types";
 import type { Database, Json } from "./database.generated";
 import { ConflictError } from "../domain/errors";
 import { isPublicTrustEventType, type PublicTrustEventType } from "../trust-events";
@@ -77,6 +77,21 @@ export class SupabaseRepository implements Repository {
     return { profile, providerProfile: providerProfile || null };
   }
   async getProfileByUserId(userId: string) { return (await this.query<ApplicationProfileRecord>("profiles", ["user_id", userId]))[0] || null; }
+  async getProfileBundleByUserId(userId: string): Promise<ProfileBundle | null> {
+    const [profile] = await this.query<ApplicationProfileRecord>("profiles", ["user_id", userId]);
+    if (!profile) return null;
+    const [providerProfile] = await this.query<ProviderProfileRecord>("provider_profiles", ["user_id", userId]);
+    return { profile, providerProfile: providerProfile || null };
+  }
+  async updateAccountProfile(userId: string, input: AccountProfileInput) {
+    const { error } = await getSupabaseClient().rpc("tl_update_account_profile", { p_user_id: userId, p_input: input as unknown as Json });
+    if (error) throw new Error("Account profile update failed.");
+  }
+  async enableProvider(userId: string, input: ProviderOnboardingInput): Promise<ProviderProfileRecord> {
+    const { data, error } = await getSupabaseClient().rpc("tl_enable_provider", { p_user_id: userId, p_input: input as unknown as Json });
+    if (error || !data) throw new Error("Provider onboarding failed.");
+    return camel<ProviderProfileRecord>(data);
+  }
   async updateProfile(userId: string, input: ProfileInput) {
     const { error } = await getSupabaseClient().rpc("tl_update_profile", { p_user_id: userId, p_input: input as unknown as Json });
     if (error) throw new Error("Profile update failed.");

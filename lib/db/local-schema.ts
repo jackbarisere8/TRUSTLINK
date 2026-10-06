@@ -18,7 +18,23 @@ const commandHash = /^[a-f0-9]{64}$/;
 
 const profileSchema: z.ZodType<ProfileBundle> = z.object({
   profile: z.object({ id: text, userId: text, username: text, displayName: text, avatarUrl: optionalText, country: text, state: optionalText, city: optionalText, createdAt: timestamp }),
-  providerProfile: z.object({ id: text, userId: text, headline: text, bio: optionalText, serviceArea: text, verificationStatus: z.enum(["UNVERIFIED", "IDENTITY_PROVIDED", "VERIFIED_BY_TRUSTLINK"]), createdAt: timestamp }).nullable(),
+  providerProfile: z.object({
+    id: text,
+    userId: text,
+    headline: text,
+    bio: optionalText,
+    serviceArea: text,
+    verificationStatus: z.enum(["UNVERIFIED", "IDENTITY_PROVIDED", "VERIFIED_BY_TRUSTLINK"]),
+    marketplaceStatus: z.enum(["NOT_LISTED", "DRAFT", "PUBLISHED", "SUSPENDED"]),
+    businessName: optionalText,
+    remoteServices: z.boolean(),
+    bookingPolicy: optionalText,
+    moderationStatus: z.enum(["DRAFT", "PENDING", "APPROVED", "REJECTED", "SUSPENDED"]),
+    publishedAt: timestamp.optional(),
+    bookingCapacity: z.number().int().min(1).max(20),
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  }).nullable(),
 });
 
 export const aggregateSchema: z.ZodType<JobAggregate> = z.object({

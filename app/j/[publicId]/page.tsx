@@ -17,7 +17,6 @@ type Props = { params: Promise<{ publicId: string }> };
 function metadataText(value: string, maximum: number) {
   return value.replace(/\s+/g, " ").trim().slice(0, maximum).trim();
 }
-
 function transactionMetadata(record: PublicJobProjection): Metadata {
   const service = metadataText(record.service, 90) || "Service";
   const provider = metadataText(record.provider.displayName, 70) || "provider";

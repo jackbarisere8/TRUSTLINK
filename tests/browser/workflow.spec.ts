@@ -1,10 +1,15 @@
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-async function login(page:Page,email:string) {
-  await page.goto("/login");await page.getByLabel("Email address").fill(email);await page.getByLabel(/password/i).fill("fixture-password-only");await page.getByRole("button",{name:/log in/i}).click();await expect(page).toHaveURL(/\/dashboard$/);
+async function login(page:Page,email:string,expected:RegExp=/\/dashboard$/) {
+  await page.goto("/login");await page.getByLabel("Email address").fill(email);await page.getByLabel(/password/i).fill("fixture-password-only");await page.getByRole("button",{name:/log in/i}).click();await expect(page).toHaveURL(expected);
 }
 async function confirm(page:Page) { const button=page.getByRole("button",{name:"Confirm change",exact:true}); await button.click(); await expect(button).toHaveCount(0); }
+async function mockGeolocation(page:Page,latitude=6.6018,longitude=3.3515){
+  await page.addInitScript(({latitude,longitude})=>Object.defineProperty(navigator,"geolocation",{configurable:true,value:{
+    getCurrentPosition(success:PositionCallback){success({coords:{latitude,longitude,accuracy:10,altitude:null,altitudeAccuracy:null,heading:null,speed:null,toJSON(){return {latitude,longitude,accuracy:10};}},timestamp:Date.now(),toJSON(){return {latitude,longitude};}});},
+  }}),{latitude,longitude});
+}
 async function checkWidths(page:Page) {
   for(const width of [375,390,414,430,768,1024,1280,1440,1920]){
     await page.setViewportSize({width,height:900});
@@ -165,7 +170,7 @@ test("provider/client/admin workflow through Supabase adapter and real PostgreSQ
   await provider.reload();await provider.getByRole("button",{name:"Start revision",exact:true}).click();await provider.getByRole("button",{name:"Submit delivery",exact:true}).click();await provider.getByLabel("Describe your delivery").fill("Revised website delivery");await confirm(provider);
   await client.reload();await expect(client.getByRole("button",{name:"Request revision",exact:true})).toHaveCount(0);await expect(client.getByText("The included revision limit has been reached.",{exact:false})).toBeVisible();await client.getByRole("button",{name:"Open transaction dispute",exact:true}).click();await client.getByLabel("Details",{exact:true}).fill("Contact page is missing");await confirm(client);await expect(client.getByText("Disputed",{exact:true})).toBeVisible();
   await provider.reload();await provider.getByRole("button",{name:"Respond to dispute",exact:true}).click();await provider.getByLabel("Your response",{exact:true}).fill("I will add the missing contact page");await confirm(provider);await expect(provider.getByText("I will add the missing contact page",{exact:true})).toBeVisible();await expect(provider.getByText("under review",{exact:true})).toBeVisible();await expect(provider.getByRole("button",{name:"Respond to dispute",exact:true})).toHaveCount(0);
-  const adminContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});const admin=await adminContext.newPage();await login(admin,"admin@example.test");await admin.goto("/disputes/"+jobId);await expect(admin.getByRole("heading",{name:"Review the agreement and evidence.",exact:true})).toBeVisible();await expect(admin.getByRole("link",{name:"Review dispute evidence",exact:false})).toHaveAttribute("href","#dispute-evidence");await expect(admin.locator("#dispute-evidence")).toContainText("Contact page is missing");await admin.screenshot({path:"test-results/dispute-record-1280.png",fullPage:true});await admin.getByRole("button",{name:"Resolve dispute",exact:true}).click();await admin.getByLabel("Resolution notes",{exact:true}).fill("Provider will submit the missing contact page");await expect(admin.getByText("does not hold funds",{exact:false})).toBeVisible();await confirm(admin);
+  const adminContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});const admin=await adminContext.newPage();await login(admin,"admin@example.test",/\/admin$/);await admin.goto("/disputes/"+jobId);await expect(admin.getByRole("heading",{name:"Review the agreement and evidence.",exact:true})).toBeVisible();await expect(admin.getByRole("link",{name:"Review dispute evidence",exact:false})).toHaveAttribute("href","#dispute-evidence");await expect(admin.locator("#dispute-evidence")).toContainText("Contact page is missing");await admin.screenshot({path:"test-results/dispute-record-1280.png",fullPage:true});await admin.getByRole("button",{name:"Resolve dispute",exact:true}).click();await admin.getByLabel("Resolution notes",{exact:true}).fill("Provider will submit the missing contact page");await expect(admin.getByText("does not hold funds",{exact:false})).toBeVisible();await confirm(admin);
   await provider.reload();await provider.getByRole("button",{name:"Submit delivery",exact:true}).click();await provider.getByLabel("Describe your delivery").fill("Complete website including contact page");await confirm(provider);
   await client.reload();await client.getByRole("button",{name:"Approve delivery",exact:true}).click();await confirm(client);await expect(client.getByText("Approved",{exact:true})).toBeVisible();
   await provider.reload();await provider.getByRole("button",{name:"Complete transaction",exact:true}).click();await expect(provider.getByText("Completed",{exact:true})).toBeVisible();
@@ -211,6 +216,7 @@ test("Supabase sessions enforce trusted roles, secure cookies and logout",async(
   const providerContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});const provider=await providerContext.newPage();
   await login(provider,"provider@example.test");
   await expectReachable(provider,["/dashboard","/dashboard/jobs","/dashboard/jobs/new","/dashboard/profile","/dashboard/settings"]);
+  await provider.goto("/account");await expect(provider.getByRole("heading",{name:/Welcome, Ada Provider/})).toBeVisible();await provider.getByRole("link",{name:"Provider workspace",exact:true}).click();await expect(provider).toHaveURL(/\/dashboard$/);
   const authCookies=(await providerContext.cookies()).filter(cookie=>cookie.name.startsWith("sb-"));
   expect(authCookies.length).toBeGreaterThan(0);
   for(const cookie of authCookies){expect(cookie.httpOnly).toBe(true);expect(cookie.secure).toBe(true);expect(cookie.sameSite).toBe("Lax");}
@@ -222,9 +228,166 @@ test("Supabase sessions enforce trusted roles, secure cookies and logout",async(
   await login(metadata,"metadata-admin@example.test");await metadata.goto("/admin");await expect(metadata.getByRole("heading",{name:"Page not found.",exact:true})).toBeVisible();
 
   const adminContext=await browser.newContext({baseURL:"http://127.0.0.1:3001"});const admin=await adminContext.newPage();
-  await login(admin,"admin@example.test");await expectReachable(admin,["/admin","/admin/users","/admin/jobs","/admin/disputes","/admin/events","/admin/validation"]);await expect(admin.getByRole("heading",{name:"Product signals",exact:true})).toBeVisible();
+  await login(admin,"admin@example.test",/\/admin$/);await expectReachable(admin,["/admin","/admin/users","/admin/jobs","/admin/disputes","/admin/events","/admin/validation"]);await expect(admin.getByRole("heading",{name:"Product signals",exact:true})).toBeVisible();
   await checkWidths(admin);
   for(const width of [390,1440]){await admin.setViewportSize({width,height:900});if(width===390)await expect(admin.getByText("Accepted providers",{exact:true}).first()).toBeVisible();await admin.screenshot({path:`test-results/validation-${width}.png`,fullPage:true});}
   await admin.goto("/dashboard/jobs/new");await expect(admin.getByRole("heading",{name:"Page not found.",exact:true})).toBeVisible();
   await rejectedContext.close();await forgedContext.close();await providerContext.close();await metadataContext.close();await adminContext.close();
+});
+
+test("a customer can sign up, enable a private provider draft, and switch workspaces",async({page})=>{
+  const email="new-customer@example.test";
+  await page.goto("/signup");
+  await page.getByLabel("Full name").fill("New Customer");
+  await page.getByLabel("Email address").fill(email);
+  await page.getByLabel("Choose password").fill("fixture-password-only");
+  await page.getByRole("button",{name:"Create account",exact:false}).click();
+  await expect(page).toHaveURL(/\/account$/);
+  await expect(page.getByRole("heading",{name:"Welcome, New Customer",exact:true})).toBeVisible();
+  await expect(page.getByRole("link",{name:"Become a provider",exact:true}).first()).toBeVisible();
+
+  await page.goto("/dashboard");
+  await expect(page.getByRole("heading",{name:"Page not found.",exact:true})).toBeVisible();
+  await page.goto("/account/become-provider");
+  await page.getByLabel("Professional headline").fill("Website developer");
+  await page.getByLabel("Service area").fill("Ikeja, Lagos");
+  await page.getByRole("button",{name:"Enable provider workspace",exact:true}).click();
+  await expect(page).toHaveURL(/\/dashboard\/profile$/);
+  await expect(page.getByText("Profile status: Draft",{exact:true})).toBeVisible();
+  await expect(page.getByText("This provider draft is private.",{exact:false})).toBeVisible();
+  await expect(page.getByRole("link",{name:/View public Trust Profile/})).toHaveCount(0);
+
+  await page.goto("/dashboard/settings");
+  const draftProfilePath=await page.locator("dd.record-id").innerText();
+  await page.goto(draftProfilePath);
+  await expect(page.getByRole("heading",{name:"Page not found.",exact:true})).toBeVisible();
+  await page.goto("/account");
+  await expect(page.getByRole("link",{name:"Open provider workspace",exact:true})).toBeVisible();
+  await page.getByRole("link",{name:"Open provider workspace",exact:true}).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+
+  await page.getByRole("button",{name:"Sign out",exact:true}).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await login(page,email);
+});
+
+test("a provider can configure services, service areas, availability, preview, and publication",async({page})=>{
+  test.setTimeout(180000);
+  await mockGeolocation(page);
+  await login(page,"marketplace@example.test");
+  await page.goto("/dashboard/services");
+  await expect(page.getByRole("heading",{name:"Your marketplace services",exact:true})).toBeVisible();
+  await expect(page.getByText("You have not created a marketplace service yet.",{exact:true})).toBeVisible();
+  await expect(page.getByRole("button",{name:"Publish marketplace profile",exact:true})).toBeDisabled();
+
+  await page.getByRole("link",{name:"Add a service",exact:true}).click();
+  await expect(page).toHaveURL(/\/dashboard\/services\/new$/);
+  await page.getByLabel("Category").selectOption({label:"Technology & Digital"});
+  await page.getByRole("combobox",{name:"Service",exact:true}).selectOption({label:"Website Development"});
+  await page.getByLabel("Public service title").fill("Premium business website");
+  await page.getByLabel("Description").fill("Design and development of a responsive business website with clear scope and deployment support.");
+  await page.getByLabel("Pricing model").selectOption("STARTING_AT");
+  await page.getByLabel("Minimum price (NGN)").fill("85000");
+  await page.getByLabel("Maximum price (optional)").fill("250000");
+  await page.getByLabel("Available durations in minutes").fill("60, 120");
+  await page.getByLabel("On-site service").check();
+  await page.getByLabel("State or FCT").selectOption({label:"Lagos"});
+  await page.getByLabel("LGA or area council (optional)").selectOption({label:"Ikeja"});
+  await page.getByLabel("Approximate origin (optional)").fill("Ikeja area");
+  await page.getByLabel("Travel radius in km (optional)").fill("25");
+  await page.getByLabel(/Make this service active/).check();
+  await page.getByRole("button",{name:"Create service",exact:true}).click();
+  await expect(page).toHaveURL(/\/dashboard\/services$/);
+  await expect(page.getByRole("heading",{name:"Premium business website",exact:true})).toBeVisible();
+  await expect(page.getByText("Active",{exact:true})).toBeVisible();
+
+  await page.goto("/dashboard/availability");
+  await page.getByRole("checkbox",{name:"Monday",exact:true}).check();
+  await page.getByLabel("Monday start time").fill("09:00");
+  await page.getByLabel("Monday end time").fill("17:00");
+  await page.getByRole("button",{name:"Save weekly hours",exact:true}).click();
+  await expect(page.getByRole("status")).toContainText("Weekly availability saved");
+  await page.getByLabel("Starts").fill("2026-12-24T09:00");
+  await page.getByLabel("Ends").fill("2026-12-26T17:00");
+  await page.getByLabel("Private note (optional)").fill("Private family leave");
+  await page.getByRole("button",{name:"Add blackout period",exact:true}).click();
+  await expect(page.getByText("Private family leave",{exact:false})).toBeVisible();
+
+  await page.goto("/dashboard/profile/preview");
+  await expect(page.getByRole("heading",{name:"Premium business website",exact:true})).toBeVisible();
+  await expect(page.getByText(/Ikeja area, Ikeja, Lagos/)).toBeVisible();
+  await expect(page.getByText("Monday",{exact:true})).toBeVisible();
+  await expect(page.getByText("Private family leave",{exact:false})).toHaveCount(0);
+  const previewHtml=await page.locator("main").innerHTML();
+  expect(previewHtml).not.toContain("latitude");expect(previewHtml).not.toContain("longitude");expect(previewHtml).not.toContain("private_address");
+
+  await page.goto("/dashboard/services");
+  await page.getByRole("button",{name:"Publish marketplace profile",exact:true}).click();
+  await expect(page.getByText(/Status: Published/)).toBeVisible();
+  await expect(page.getByRole("button",{name:"Unpublish marketplace profile",exact:true})).toBeVisible();
+  await page.getByRole("link",{name:"Edit",exact:true}).click();
+  await page.getByRole("button",{name:"Use my current location",exact:true}).click();
+  await expect(page.getByRole("status")).toContainText("Nearby matching is enabled");
+  await page.getByLabel("Public service title").fill("Premium company website");
+  await page.getByRole("button",{name:"Save service",exact:true}).click();
+  await expect(page).toHaveURL(/\/dashboard\/services$/);
+  await expect(page.getByRole("heading",{name:"Premium company website",exact:true})).toBeVisible();
+
+  await page.getByRole("button",{name:"Unpublish marketplace profile",exact:true}).click();
+  await expect(page.getByText(/Status: Private draft/)).toBeVisible();
+  await page.getByRole("button",{name:"Archive",exact:true}).click();
+  await expect(page.getByText("Archived",{exact:true})).toBeVisible();
+  await expect(page.getByRole("button",{name:"Publish marketplace profile",exact:true})).toBeDisabled();
+});
+
+test("published provider discovery supports server filters and transient nearby matching",async({page})=>{
+  await mockGeolocation(page);
+  await page.goto("/");
+  await expect(page.getByRole("heading",{name:"Business website development",exact:true}).first()).toBeVisible();
+  await expect(page.getByText("Discovery Studio",{exact:true}).first()).toBeVisible();
+  await page.goto("/providers?q=website&category=technology-digital&state=NG025&lga=NG025011&remote=1&date=2026-10-05");
+  await expect(page.getByRole("heading",{name:"Business website development",exact:true})).toBeVisible();
+  const discoveryCard=page.locator("article").filter({hasText:"Discovery Studio"});
+  await expect(discoveryCard.getByText("Availability checked",{exact:true})).toBeVisible();
+  await expect(discoveryCard.getByRole("link",{name:"View profile",exact:false})).toHaveAttribute("href","/p/discovery-studio");
+  const publicHtml=await page.locator("main").innerHTML();
+  for(const privateName of ["origin_latitude","origin_longitude","private_address"])expect(publicHtml).not.toContain(privateName);
+
+  await page.goto("/providers?q=website&nearby=1&radius=5&sort=nearest");
+  await page.getByRole("button",{name:"Use my location",exact:true}).click();
+  await expect(page.getByText(/provider services? within 5 km/)).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Business website development",exact:true})).toBeVisible();
+  await expect(page.getByText(/km away/)).toBeVisible();
+  expect(page.url()).not.toMatch(/latitude|longitude|6\.6018|3\.3515/);
+});
+
+test("password recovery is non-enumerating, rejects invalid links, and rotates credentials",async({page})=>{
+  await page.goto("/forgot-password");
+  await page.getByLabel("Email address").fill("missing@example.test");
+  await page.getByRole("button",{name:"Send reset link",exact:true}).click();
+  await expect(page.getByRole("status")).toHaveText("If an account exists for that email, a password reset link will arrive shortly.");
+
+  await page.getByLabel("Email address").fill("provider@example.test");
+  await page.getByRole("button",{name:"Send reset link",exact:true}).click();
+  await expect(page.getByRole("status")).toHaveText("If an account exists for that email, a password reset link will arrive shortly.");
+
+  await page.goto("/auth/recovery?token_hash=invalid&type=recovery");
+  await expect(page).toHaveURL(/\/login\?recovery=failed$/);
+  await expect(page.locator("main").getByRole("alert")).toContainText("invalid or expired");
+
+  await page.goto("/auth/recovery?token_hash=fixture-recovery-token&type=recovery");
+  await expect(page).toHaveURL(/\/reset-password$/);
+  await page.getByLabel(/^New password/).fill("replacement-password");
+  await page.getByLabel(/^Confirm new password/).fill("replacement-password");
+  await page.getByRole("button",{name:"Change password",exact:true}).click();
+  await expect(page).toHaveURL(/\/login\?recovery=updated$/);
+  await expect(page.locator("main").getByRole("status")).toContainText("password was changed");
+
+  await page.getByLabel("Email address").fill("provider@example.test");
+  await page.getByLabel(/^Password/).fill("fixture-password-only");
+  await page.getByRole("button",{name:"Log in to TrustLink",exact:true}).click();
+  await expect(page.locator("main").getByRole("alert")).toContainText("couldn't sign you in");
+  await page.getByLabel(/^Password/).fill("replacement-password");
+  await page.getByRole("button",{name:"Log in to TrustLink",exact:true}).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
 });

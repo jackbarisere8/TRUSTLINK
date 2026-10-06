@@ -2,11 +2,22 @@ import { test, expect } from "@playwright/test";
 
 const widths = [375,390,414,430,768,1024,1280,1440,1920];
 
+test("application responses include the enforced browser security policy", async ({ request }) => {
+  const response = await request.get("/");
+  expect(response.ok()).toBe(true);
+  const headers = response.headers();
+  expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
+  expect(headers["content-security-policy"]).toContain("object-src 'none'");
+  expect(headers["x-content-type-options"]).toBe("nosniff");
+  expect(headers["x-frame-options"]).toBe("DENY");
+  expect(headers["referrer-policy"]).toBe("no-referrer");
+});
+
 test("public routes render without console errors or horizontal overflow", async ({ page }) => {
   test.setTimeout(300000);
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
-  for (const route of ["/","/p/amaka","/how-it-works","/for-providers","/for-businesses","/explore","/pathfinder","/learn","/opportunities","/login","/signup","/terms","/privacy"]) {
+  for (const route of ["/","/providers","/p/amaka","/how-it-works","/for-providers","/for-businesses","/explore","/pathfinder","/learn","/opportunities","/login","/signup","/terms","/privacy"]) {
     const response = await page.goto(route);
     expect(response?.status(), route).toBe(200);
     await expect(page.locator("h1").first()).toBeVisible();
@@ -47,6 +58,34 @@ test("simulator uses the same record and updates entered terms", async ({ page }
   await expect(preview.getByText("Nothing here is saved or published.", { exact: false })).toBeVisible();
 });
 
+test("homepage discovery and provider filters recover honestly from invalid and empty searches",async({page})=>{
+  await page.goto("/");
+  await expect(page.getByRole("heading",{name:/Find the right provider/i})).toBeVisible();
+  const search=page.getByRole("form",{name:"Find a provider"});
+  await search.getByRole("searchbox",{name:"Service"}).fill("mechanic");
+  await search.getByRole("button",{name:"Search",exact:true}).click();
+  await expect(page).toHaveURL(/\/providers\?q=mechanic/);
+  await expect(page.getByRole("heading",{name:"Try a broader search",exact:true})).toBeVisible();
+  await expect(page.getByText(/does not add demo providers/i)).toBeVisible();
+  await page.goto("/providers?state=Lagos&lga=bad&page=zero&private_address=secret");
+  await expect(page.getByText("We adjusted this search.",{exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Try a broader search",exact:true})).toBeVisible();
+  expect(await page.locator("main").innerText()).not.toContain("secret");
+});
+
+test("mobile provider filters are keyboard operable and denied geolocation has a non-location fallback",async({page})=>{
+  await page.addInitScript(()=>Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(_success:PositionCallback,error:PositionErrorCallback){error({code:1,message:"denied",PERMISSION_DENIED:1,POSITION_UNAVAILABLE:2,TIMEOUT:3});}}}));
+  await page.setViewportSize({width:390,height:844});
+  await page.goto("/providers?nearby=1&radius=10");
+  const filters=page.getByRole("button",{name:"Filters",exact:true});
+  await filters.click();await expect(page.locator("#provider-filters")).toBeVisible();
+  await page.keyboard.press("Escape");await expect(page.locator("#provider-filters")).not.toBeVisible();await expect(filters).toBeFocused();
+  await page.getByRole("button",{name:"Use my location",exact:true}).click();
+  await expect(page.locator("main").getByRole("alert")).toContainText("permission was denied");
+  await expect(page.getByText(/state, LGA, or remote filters/i)).toBeVisible();
+  const html=await page.locator("main").innerHTML();expect(html).not.toContain("latitude");expect(html).not.toContain("longitude");
+});
+
 test("mobile menu, keyboard dialog, example preview and auth guards", async ({ page, context }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
@@ -84,10 +123,10 @@ test("interrupted account submissions show an error and can be retried", async (
   for (const route of ["/login","/signup"]) {
     await page.goto(route);
     await page.route("**/*", async request => request.request().method() === "POST" ? request.abort("failed") : request.continue());
-    if (route === "/signup") await page.getByLabel("Full name or business name").fill("Test Provider");
+    if (route === "/signup") await page.getByLabel("Full name").fill("Test Customer");
     await page.getByLabel("Email address").fill("person@example.test");
     await page.getByLabel(/password/i).fill("test-password-only");
-    const button = page.getByRole("button", { name: route === "/login" ? /log in to/i : /get started free/i });
+    const button = page.getByRole("button", { name: route === "/login" ? /log in to/i : /create account/i });
     await button.click();
     await expect(page.locator("main").getByRole("alert")).toContainText("Connection interrupted");
     await expect(button).toBeEnabled();
@@ -96,7 +135,7 @@ test("interrupted account submissions show an error and can be retried", async (
 });
 
 test("capture desktop and mobile product surfaces", async ({ page }) => {
-  for (const [name,route] of [["home","/"],["record-preview","/#preview"],["profile","/p/amaka"],["how-it-works","/how-it-works"],["for-providers","/for-providers"],["for-businesses","/for-businesses"],["explore","/explore"],["login","/login"],["signup","/signup"]]) {
+  for (const [name,route] of [["home","/"],["providers","/providers"],["record-preview","/#preview"],["profile","/p/amaka"],["how-it-works","/how-it-works"],["for-providers","/for-providers"],["for-businesses","/for-businesses"],["explore","/explore"],["login","/login"],["signup","/signup"]]) {
     for (const width of [390,1440]) {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(route);

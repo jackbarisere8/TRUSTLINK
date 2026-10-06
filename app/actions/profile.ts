@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 export async function updateProfileAction(input: unknown) {
   const user = await getCurrentUser();
   if (!user) return {error:"Log in to edit your profile."};
+  if (user.role !== "PROVIDER") return {error:"Enable your provider workspace before editing a provider profile."};
   try { await updateProviderProfile(db,user.userId,input); }
   catch (error) { return {error:publicError(error)}; }
   revalidatePath("/dashboard/profile"); revalidatePath("/p/"+user.username);

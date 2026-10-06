@@ -3,6 +3,7 @@ import { Dialog } from "@/components/ui/dialog";
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 interface PracticeBlueprint {
@@ -23,7 +24,7 @@ const BLUEPRINTS: PracticeBlueprint[] = [
     id: "bp_01",
     title: "3.5kVA Hybrid Solar Inverter Sizing & Installation Plan",
     category: "Engineering & Energy",
-    careerSlug: "solar-inverter-technician",
+    careerSlug: "solar-energy-technician",
     description:
       "Simulate a real residential client brief: audit total home electrical wattage, size the inverter, calculate battery amp-hours, and draw the DC breaker isolation circuit.",
     difficulty: "Intermediate",
@@ -74,7 +75,7 @@ const BLUEPRINTS: PracticeBlueprint[] = [
     id: "bp_04",
     title: "Tailored 3-Piece Senator Suit with Geometric Precision",
     category: "Skilled Trades",
-    careerSlug: "bespoke-fashion-designer",
+    careerSlug: "fashion-designer-apparel-maker",
     description:
       "Draft a custom pattern, inspect and pre-shrink premium cashmere wool, execute neck piping and shoulder pads, and complete hand-finished hemline stitching.",
     difficulty: "Advanced",
@@ -119,15 +120,51 @@ const BLUEPRINTS: PracticeBlueprint[] = [
       "Data classification and storage risk analysis",
       "Executive summary report with actionable remediation steps",
     ],
-    clientScenario: "A secondary school in Lagos collecting student biometric records needs an independent audit to avoid NDPC regulatory penalties.",
+    clientScenario: "A fictional school wants a tabletop review of how student records could be classified and protected. Do not scan systems without written authorization.",
+  },
+  {
+    id: "bp_07",
+    title: "Accessible Service-Booking Prototype",
+    category: "Technology",
+    careerSlug: "software-engineer",
+    description: "Build a local-only prototype with validated forms, accessible status messages, and automated tests. It is not a live booking service.",
+    difficulty: "Intermediate",
+    estimatedTime: "5–7 days",
+    toolsRequired: ["Code editor", "Local Node.js environment", "Browser accessibility tools"],
+    deliverablesEvidence: [
+      "Source code for the local prototype",
+      "Automated validation and authorization tests",
+      "Short accessibility review notes",
+    ],
+    clientScenario: "A fictional service business needs a prototype for collecting appointment requests without processing payments or publishing customer data.",
+  },
+  {
+    id: "bp_08",
+    title: "Residential Circuit Plan and Safety Checklist",
+    category: "Skilled Trades",
+    careerSlug: "electrical-installation-artisan",
+    description: "Prepare a paper design, load schedule, and inspection checklist for review by a qualified supervisor. Do not energize or alter a live circuit.",
+    difficulty: "Beginner",
+    estimatedTime: "2–3 days",
+    toolsRequired: ["Graph paper or CAD tool", "Current wiring-code reference", "Supervisor review checklist"],
+    deliverablesEvidence: [
+      "Annotated single-line circuit diagram",
+      "Load and protective-device schedule",
+      "Pre-energization inspection checklist",
+    ],
+    clientScenario: "A fictional one-room studio needs a draft lighting and socket plan for independent review by a licensed electrical professional.",
   },
 ];
 
 export function LearnView() {
+  const searchParams = useSearchParams();
+  const careerParam = searchParams.get("career");
+  const requestedCareer = BLUEPRINTS.some(blueprint => blueprint.careerSlug === careerParam) ? careerParam : null;
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [activeBlueprint, setActiveBlueprint] = useState<PracticeBlueprint | null>(null);
 
   const filtered = BLUEPRINTS.filter((bp) => {
+    if (requestedCareer && bp.careerSlug !== requestedCareer) return false;
     if (selectedCategory === "All") return true;
     return bp.category === selectedCategory;
   });
@@ -186,7 +223,7 @@ export function LearnView() {
               {/* Realistic Client Scenario */}
               <div className="p-3 bg-surface-50 rounded-lg border border-surface-200 space-y-1">
                 <p className="text-2xs font-bold  text-surface-400">
-                  Real Client Scenario
+                  Practice scenario
                 </p>
                 <p className="text-xs text-surface-600 italic line-clamp-2">
                   &ldquo;{bp.clientScenario}&rdquo;
@@ -196,7 +233,7 @@ export function LearnView() {
               {/* Evidence Produced */}
               <div>
                 <p className="text-2xs font-bold  text-surface-400 mb-1">
-                  Deliverable Proof You Build:
+                  Example deliverables:
                 </p>
                 <ul className="space-y-1 text-xs text-surface-600">
                   {bp.deliverablesEvidence.slice(0, 2).map((item, idx) => (
@@ -218,7 +255,7 @@ export function LearnView() {
                 View Full Brief &amp; Checklist →
               </button>
               <Link
-                href={`/explore?q=${encodeURIComponent(bp.title)}`}
+                href={`/explore?career=${encodeURIComponent(bp.careerSlug)}`}
                 className="text-2xs font-bold  text-surface-500 hover:text-navy-900"
               >
                 Career Info
@@ -282,7 +319,7 @@ export function LearnView() {
 
             <div className="space-y-2">
               <h3 className="text-xs font-bold  text-navy-900">
-                Verifiable Deliverables (Attach to TrustLink)
+                Example deliverables to keep privately
               </h3>
               <ul className="space-y-1.5 text-sm text-surface-700 list-disc pl-5">
                 {activeBlueprint.deliverablesEvidence.map((d, idx) => (
@@ -294,7 +331,7 @@ export function LearnView() {
             <div className="p-4 rounded-xl bg-surface-50 border border-surface-200 space-y-1 text-xs text-navy-900">
               <p className="font-bold">Turn this project into your Trust Profile proof:</p>
               <p className="text-surface-700">
-                When completed, upload the documentation files to your TrustLink account. Prospective clients can inspect your actual execution before hiring you.
+                This pilot does not upload, assess, certify, or publish these files. Keep practice work private unless you independently choose a safe place to share it.
               </p>
             </div>
 

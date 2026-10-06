@@ -1,33 +1,207 @@
-import Link from "next/link";
 import { Navbar } from "@/components/navigation/navbar";
 import { Footer } from "@/components/navigation/footer";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "How TrustLink works",
-  description: "See how providers and clients record service terms, accept an agreement, follow delivery and close a transaction.",
+  title: "How TrustLink Works",
+  description:
+    "Learn how independent Nigerian service providers and clients use TrustLink to turn informal agreements into structured, evidence-backed transactions.",
 };
 
-const steps = [
-  ["Create the record", "The provider writes the service, scope, deliverables, agreed fee, deadline, revisions and cancellation terms. The record begins with the agreement, not a payment claim."],
-  ["Send the link", "TrustLink creates a public record and a separate private participant link. The provider shares the private link with the intended client. The client can review the terms in a browser."],
-  ["Accept and work", "The client accepts the exact terms. If payment happens directly between the parties, the provider can declare it received before starting work. Delivery and revision requests stay connected to the record."],
-  ["Close the record", "After delivery is approved, the provider completes the transaction. A client review may be added to the completed record and reflected in the provider's Trust Profile."],
+const STEPS = [
+  {
+    number: "01",
+    title: "Define the agreement",
+    subtitle: "Turn chat messages into structured terms",
+    description:
+      "When a client agrees to work with you on WhatsApp, Instagram, or via referral, open TrustLink to create a Job. Specify the exact deliverables, total price in Naira, deadline date, number of included revisions, and cancellation terms.",
+    details: [
+      "Select your source channel (WhatsApp, Instagram, Referral, Direct)",
+      "Set clear milestone or delivery deadlines",
+      "Explicit revision limits prevent endless unpaid changes",
+      "Set transparent cancellation and refund conditions",
+    ],
+  },
+  {
+    number: "02",
+    title: "Share your universal Job URL",
+    subtitle: "Send one link anywhere you converse",
+    description:
+      "TrustLink generates a unique, shareable link (e.g. trustlink.ng/j/web-revamp-2026). Copy it into your chat thread, send via SMS, or display a QR code. Your client needs zero special software to open it.",
+    details: [
+      "Works on any mobile browser across Nigeria",
+      "No app download required for your client",
+      "Rich link preview (Open Graph) shows key details immediately",
+      "Complete transparency before any work starts",
+    ],
+  },
+  {
+    number: "03",
+    title: "Client review and acceptance",
+    subtitle: "Explicit agreement, timestamped and recorded",
+    description:
+      "The client opens the Job Page, reviews the provider's verified identity, service scope, and terms, and explicitly accepts the agreement. Once accepted, payment status is recorded.",
+    details: [
+      "Client enters verifiable contact information",
+      "Explicit 'I accept these terms' confirmation",
+      "Payment Recorded status logs transaction commencement",
+      "Append-only event created in the trust ledger",
+    ],
+  },
+  {
+    number: "04",
+    title: "Deliver, revise, and build reputation",
+    subtitle: "Proof stays attached to the job forever",
+    description:
+      "Submit deliverables, link files, or share drafts directly in the workspace. Clients can request designated revisions or approve the work. Upon approval, both parties leave mutual reviews, building your public Trust Profile.",
+    details: [
+      "Structured delivery submissions with file links and notes",
+      "Clear revision tracking against included rounds",
+      "Dispute option if terms are violated",
+      "Mutual 1–5 ratings build your verifiable Trust Profile",
+    ],
+  },
 ];
 
-const questions = [
-  ["Does TrustLink hold or verify a payment?", "No. The parties pay each other directly. A payment record is the provider's declaration of receipt; TrustLink does not hold funds or independently verify a transfer."],
-  ["Does the client need an account?", "No account or app installation is required for the client participant flow. The client uses a private link to accept and manage their side of the transaction."],
-  ["Are participant details verified?", "The client supplies a name and email at acceptance. Those details are recorded as self-provided and are not independent identity verification."],
-  ["What if the work needs a change or a dispute?", "The client can request an included revision after delivery. Either authorized participant can open a structured dispute in the supported states; its submissions and resolution remain attached to the transaction."],
-  ["Where do profile metrics come from?", "Completed transaction records, recorded delivery dates and client reviews produce the Trust Profile. Missing evidence appears as a dash, and agreed prices and payment totals are excluded."],
+const FAQS = [
+  {
+    q: "Does TrustLink hold my money or act as an escrow?",
+    a: "No. In V0.1, TrustLink operates strictly on a 'Payment Recorded' model. We do not hold client funds, manage internal wallets, or operate an escrow ledger. Payments are handled directly between provider and client (e.g. bank transfer), and TrustLink provides the immutable audit record of what was agreed, paid, and delivered.",
+  },
+  {
+    q: "Does my client need to install an app or create an account?",
+    a: "No app installation is ever required. Your client simply opens the link in their mobile browser (Chrome, Safari, etc.) to review the scope and accept the terms. They only provide basic contact information to confirm their identity.",
+  },
+  {
+    q: "What does 'Payment Recorded' mean on a job page?",
+    a: "It indicates that both parties acknowledge the payment has been initiated or received directly. TrustLink records this milestone with a timestamp to anchor the transaction timeline.",
+  },
+  {
+    q: "What happens if there is a dispute during the job?",
+    a: "Either party can raise a structured dispute from the job workspace under specific categories: Scope, Quality, Deadline, or Payment. Both parties can submit evidence (screenshots, files, agreements), which is reviewed by TrustLink administrators to facilitate a fair resolution.",
+  },
+  {
+    q: "How does the Trust Profile work?",
+    a: "Your Trust Profile is derived directly from verifiable completed jobs, mutual client ratings, and repeat hire metrics. It does not use opaque algorithms or fake scoring; every metric reflects real transactions completed on TrustLink.",
+  },
 ];
 
 export default function HowItWorksPage() {
-  return <><Navbar/><main id="main-content">
-    <section className="border-b border-[#dbe2e3] bg-[#f4f6f3] py-16 sm:py-22 lg:py-26"><div className="shell grid gap-10 lg:grid-cols-[1fr_.7fr] lg:gap-24"><div><p className="eyebrow">How TrustLink works</p><h1 className="page-heading mt-5 max-w-2xl text-[3.1rem] sm:text-[4.2rem] text-balance">A clear record from agreement to delivery.</h1></div><div className="lg:pt-10"><p className="max-w-md text-base leading-8 text-surface-700">Agree wherever you already talk. Put the terms in one place. Give your client a way to review, accept and follow the work.</p><Link href="/#preview" className="quiet-link mt-6 inline-block py-2 text-sm font-semibold">See an example record →</Link></div></div></section>
-    <section className="section border-b border-[#dbe2e3] bg-white"><div className="shell"><p className="eyebrow">The transaction sequence</p><div className="mt-8 border-t border-[#dbe2e3]">{steps.map(([title, body], index) => <div key={title} className="grid gap-3 border-b border-[#dbe2e3] py-8 sm:grid-cols-[5rem_.55fr_1fr] sm:gap-8"><span className="font-mono text-sm text-surface-600">{String(index + 1).padStart(2, "0")}</span><h2 className="text-xl font-semibold">{title}</h2><p className="max-w-xl text-sm leading-7 text-surface-700">{body}</p></div>)}</div></div></section>
-    <section className="section border-b border-[#dbe2e3] bg-[#f4f6f3]"><div className="shell grid gap-10 lg:grid-cols-[.75fr_1.25fr] lg:gap-20"><div><p className="eyebrow">Common questions</p><h2 className="interface-heading mt-4 text-[2.4rem] sm:text-[3rem]">What the record does, and what it does not.</h2></div><div className="border-t border-[#cbd6d9]">{questions.map(([question, answer]) => <div key={question} className="border-b border-[#cbd6d9] py-6"><h3 className="font-semibold">{question}</h3><p className="mt-3 text-sm leading-7 text-surface-700">{answer}</p></div>)}</div></div></section>
-    <section className="section bg-navy-900 text-white"><div className="shell flex flex-col items-start justify-between gap-8 md:flex-row md:items-center"><div><p className="eyebrow !text-[#a9c6c7]">Start with an agreement</p><h2 className="interface-heading mt-4 text-[2.4rem] sm:text-[3rem]">Ready to make the terms clear?</h2></div><Button href="/signup" size="lg" className="bg-white text-navy-900 hover:bg-surface-100">Create a TrustLink →</Button></div></section>
-  </main><Footer/></>;
+  return (
+    <>
+      <Navbar />
+      <main>
+        {/* Hero Header */}
+        <section className="bg-navy-900 text-white py-16 md:py-24">
+          <div className="shell text-center max-w-3xl mx-auto space-y-5">
+            <p className="text-teal-400 text-xs font-bold uppercase tracking-widest">
+              The TrustLink Process
+            </p>
+            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-balance">
+              How informal deals become{" "}
+              <em className="not-italic text-teal-400">structured transactions.</em>
+            </h1>
+            <p className="text-surface-300 text-lg leading-relaxed">
+              No long legal contracts. No complex apps. Just a clear, verifiable record
+              of scope, price, deadline, and proof.
+            </p>
+          </div>
+        </section>
+
+        {/* Step-by-Step Breakdown */}
+        <section className="section bg-surface-50">
+          <div className="shell max-w-4xl mx-auto space-y-16">
+            {STEPS.map((step, idx) => (
+              <div
+                key={step.number}
+                className="bg-white border border-surface-200 rounded-xl p-8 md:p-10 shadow-card grid grid-cols-1 md:grid-cols-12 gap-8 items-start"
+              >
+                <div className="md:col-span-3">
+                  <span className="font-serif text-5xl font-bold text-teal-600 block mb-2">
+                    {step.number}
+                  </span>
+                  <span className="text-xs font-bold text-surface-400 uppercase tracking-widest">
+                    Step {idx + 1}
+                  </span>
+                </div>
+
+                <div className="md:col-span-9 space-y-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-navy-900 font-serif">
+                      {step.title}
+                    </h2>
+                    <p className="text-sm font-semibold text-teal-700 mt-1">
+                      {step.subtitle}
+                    </p>
+                  </div>
+
+                  <p className="text-surface-600 leading-relaxed text-sm">
+                    {step.description}
+                  </p>
+
+                  <div className="pt-3 border-t border-surface-100">
+                    <p className="text-xs font-bold text-navy-900 uppercase tracking-wider mb-2.5">
+                      Key features:
+                    </p>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-surface-600 list-none p-0 m-0">
+                      {step.details.map((detail) => (
+                        <li key={detail} className="flex items-start gap-2">
+                          <span className="text-teal-600 font-bold">✓</span>
+                          <span>{detail}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="section bg-white border-t border-surface-200">
+          <div className="shell max-w-3xl mx-auto">
+            <div className="text-center space-y-4 mb-14">
+              <p className="eyebrow">Frequently Asked Questions</p>
+              <h2 className="font-serif text-3xl sm:text-4xl text-navy-900 font-normal tracking-tight">
+                Clear answers, zero ambiguity
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              {FAQS.map((faq) => (
+                <div
+                  key={faq.q}
+                  className="border-b border-surface-200 pb-6 last:border-b-0 space-y-2"
+                >
+                  <h3 className="text-base font-semibold text-navy-900">
+                    {faq.q}
+                  </h3>
+                  <p className="text-sm text-surface-600 leading-relaxed">
+                    {faq.a}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Band */}
+        <section className="py-16 bg-navy-900 text-white text-center">
+          <div className="shell max-w-xl mx-auto space-y-6">
+            <h2 className="font-serif text-3xl font-normal">
+              Ready to create your first TrustLink?
+            </h2>
+            <p className="text-surface-400 text-sm">
+              It takes less than 3 minutes to formalize your agreement and share it with your client.
+            </p>
+            <Button href="/signup" variant="secondary" size="lg" className="text-white font-semibold">
+              Get started free →
+            </Button>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </>
+  );
 }

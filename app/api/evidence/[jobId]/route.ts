@@ -5,11 +5,37 @@ import { getSupabaseClient } from "@/lib/db/supabase";
 import { EVIDENCE_BUCKET, MAX_FILE_SIZE, detectFile, type EvidencePurpose } from "@/lib/storage";
 import { DomainError, publicError } from "@/lib/domain/errors";
 import { isActionAvailable } from "@/lib/domain/transactions/policy";
+import { consumeRateLimits, rateLimitPolicies } from "@/lib/security/rate-limit";
+import { clientAddressFromHeaders } from "@/lib/security/request";
+import { recordOperationalEvent } from "@/lib/observability";
+
+function evidenceMutationLimit(request: Request, jobId: string) {
+  return consumeRateLimits([
+    { scope: "evidence.mutation.address", identifier: clientAddressFromHeaders(request.headers), policy: rateLimitPolicies.evidenceAddress },
+    { scope: "evidence.mutation.record", identifier: jobId, policy: rateLimitPolicies.evidenceRecord },
+  ]);
+}
+
+function evidenceRateLimitResponse(retryAfterSeconds: number) {
+  return Response.json({ error: "Too many evidence changes. Wait before trying again." }, {
+    status: 429,
+    headers: { "Cache-Control": "no-store", "Retry-After": String(retryAfterSeconds) },
+  });
+}
+
 export async function POST(request: Request, context: { params: Promise<{ jobId: string }> }) {
   try {
-    if (!hasSameOrigin(request)) return Response.json({ error: "Invalid request origin." }, { status: 403 });
-    if (Number(request.headers.get("content-length")) > MAX_FILE_SIZE + 100000) return Response.json({ error: "The file exceeds 10 MB." }, { status: 413 });
     const { jobId } = await context.params;
+    if (!hasSameOrigin(request)) {
+      recordOperationalEvent({ event: "evidence.upload", outcome: "rejected" });
+      return Response.json({ error: "Invalid request origin." }, { status: 403 });
+    }
+    const limit = evidenceMutationLimit(request, jobId);
+    if (!limit.allowed) {
+      recordOperationalEvent({ event: "evidence.upload", outcome: "rate_limited", retryAfterSeconds: limit.retryAfterSeconds });
+      return evidenceRateLimitResponse(limit.retryAfterSeconds);
+    }
+    if (Number(request.headers.get("content-length")) > MAX_FILE_SIZE + 100000) return Response.json({ error: "The file exceeds 10 MB." }, { status: 413 });
     const { aggregate, actor } = await authorizedJob(jobId);
     if (actor.type === "CLIENT_PARTICIPANT" && !aggregate.job.clientTokenUsed) throw new DomainError("Only active participants can upload evidence.");
     if (process.env.TRUSTLINK_STORAGE !== "supabase") throw new DomainError("File uploads are not configured on this installation.");
@@ -33,8 +59,12 @@ export async function POST(request: Request, context: { params: Promise<{ jobId:
     if (error) throw new Error("Upload failed");
     const { error: insertError } = await client.from("evidence_files").insert({ job_id: jobId, storage_path: path, filename, content_type: contentType, size_bytes: file.size, uploaded_by: actor.id, purpose, attachment_status: "PENDING" });
     if (insertError) { await client.storage.from(EVIDENCE_BUCKET).remove([path]); throw new Error("Evidence record failed"); }
+    recordOperationalEvent({ event: "evidence.upload", outcome: "success", operation: purpose });
     return Response.json({ path, name: filename }, { headers: { "Cache-Control": "no-store" } });
-  } catch(error) { return Response.json({ error: publicError(error) }, { status: 400 }); }
+  } catch(error) {
+    recordOperationalEvent({ event: "evidence.upload", outcome: error instanceof DomainError ? "rejected" : "failure" });
+    return Response.json({ error: publicError(error) }, { status: 400 });
+  }
 }
 export async function GET(request: Request, context: { params: Promise<{ jobId: string }> }) {
   try {
@@ -56,8 +86,16 @@ export async function GET(request: Request, context: { params: Promise<{ jobId: 
 }
 export async function DELETE(request: Request, context: { params: Promise<{ jobId: string }> }) {
   try {
-    if (!hasSameOrigin(request)) return Response.json({ error: "Invalid request origin." }, { status: 403 });
     const { jobId } = await context.params;
+    if (!hasSameOrigin(request)) {
+      recordOperationalEvent({ event: "evidence.delete", outcome: "rejected" });
+      return Response.json({ error: "Invalid request origin." }, { status: 403 });
+    }
+    const limit = evidenceMutationLimit(request, jobId);
+    if (!limit.allowed) {
+      recordOperationalEvent({ event: "evidence.delete", outcome: "rate_limited", retryAfterSeconds: limit.retryAfterSeconds });
+      return evidenceRateLimitResponse(limit.retryAfterSeconds);
+    }
     const { aggregate, actor } = await authorizedJob(jobId);
     const path = new URL(request.url).searchParams.get("path") || "";
     if (!isEvidencePathForJob(jobId,path)) throw new DomainError("Attachment not found.");
@@ -70,9 +108,13 @@ export async function DELETE(request: Request, context: { params: Promise<{ jobI
       .eq("job_id",jobId).eq("storage_path",path).eq("uploaded_by",actor.id).eq("attachment_status","PENDING").select("storage_path");
     if (error || data?.length !== 1) throw new DomainError("Attachment not found.");
     const { error: storageError } = await client.storage.from(EVIDENCE_BUCKET).remove([path]);
+    recordOperationalEvent({ event: "evidence.delete", outcome: storageError ? "failure" : "success" });
     return Response.json({ removed: true, cleanupPending: Boolean(storageError) }, {
       status: storageError ? 202 : 200,
       headers: { "Cache-Control": "no-store" },
     });
-  } catch(error) { return Response.json({ error: publicError(error) }, { status: 403 }); }
+  } catch(error) {
+    recordOperationalEvent({ event: "evidence.delete", outcome: error instanceof DomainError ? "rejected" : "failure" });
+    return Response.json({ error: publicError(error) }, { status: 403 });
+  }
 }

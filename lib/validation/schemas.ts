@@ -1,5 +1,5 @@
 import { z } from "zod";
-export const sourceChannels = ["WhatsApp", "Instagram", "Referral", "Direct", "X (Twitter)", "LinkedIn", "Facebook", "TikTok", "Telegram", "SMS", "Email", "QR Code", "Other"] as const;
+export const sourceChannels = ["WhatsApp", "Instagram", "Referral", "Direct", "X (Twitter)", "LinkedIn", "Facebook", "TikTok", "Telegram", "SMS", "Email", "QR Code", "TrustLink Marketplace", "Other"] as const;
 const text = (max: number) => z.string().trim().min(1).max(max);
 const optionalText = (max: number) => z.string().trim().max(max).optional().transform(value => value || undefined);
 const evidencePaths = z.array(text(500)).max(10).refine(paths => new Set(paths).size === paths.length, "Duplicate attachments are not allowed.");

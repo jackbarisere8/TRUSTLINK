@@ -32,6 +32,7 @@ data/trustlink-local-v3.json*
 /artifacts/
 *.zip
 /data/trustlink-dev.json
+/.local-quarantine/
 
 # Only the blank configuration template belongs in a source handoff.
 .env.*

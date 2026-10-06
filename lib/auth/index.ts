@@ -17,6 +17,11 @@ export async function requireProvider() {
   if (user.role !== "PROVIDER") notFound();
   return user;
 }
+export async function requireAccountUser() {
+  const user = await requireUser();
+  if (user.role === "ADMIN") notFound();
+  return user;
+}
 export async function requireAdmin() {
   const user = await requireUser();
   if (user.role !== "ADMIN") notFound();

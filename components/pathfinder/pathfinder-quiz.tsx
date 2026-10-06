@@ -53,7 +53,7 @@ export function PathfinderQuiz() {
             Your Recommended Pathways
           </h2>
           <p className="text-surface-600 text-base max-w-xl mx-auto leading-relaxed">
-            Based on your work style, interests, and current stage, here are high-demand Nigerian career trajectories tailored to you.
+            Based on your answers, here are editorial pathways from this small pilot taxonomy. They are not labour-market predictions or professional advice.
           </p>
 
           {isMinor && (
@@ -134,16 +134,10 @@ export function PathfinderQuiz() {
                     </ul>
                   </div>
 
-                  {/* Practical Details: Income & Tools */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs py-2 border-y border-surface-100">
+                  {/* Practical tool preview */}
+                  <div className="text-xs py-2 border-y border-surface-100">
                     <div>
-                      <span className="text-surface-400 block font-medium mb-0.5">Estimated Nigerian Income:</span>
-                      <span className="font-semibold text-navy-900 font-mono text-sm">
-                        {career.typicalIncomeRange}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-surface-400 block font-medium mb-0.5">Essential Tools Required:</span>
+                      <span className="text-surface-400 block font-medium mb-0.5">Example tools to research:</span>
                       <span className="text-surface-700">
                         {career.toolsRequired.slice(0, 3).join(", ")}
                       </span>
@@ -175,7 +169,7 @@ export function PathfinderQuiz() {
                         size="sm"
                         className="w-full sm:w-auto text-xs"
                       >
-                        Opportunities
+                        Opportunity examples
                       </Button>
                     </div>
                   </div>

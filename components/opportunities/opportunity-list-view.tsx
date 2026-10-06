@@ -5,7 +5,8 @@ import { SAMPLE_OPPORTUNITIES, OPPORTUNITY_TYPES } from "@/lib/opportunities";
 import { Input } from "@/components/ui/input";
 export function OpportunityListView() {
   const params=useSearchParams();const [query,setQuery]=useState(params.get("q")||"");const [type,setType]=useState(params.get("type")||"ALL");const [remote,setRemote]=useState(false);
-  const career=params.get("career");
+  const careerParam=params.get("career");
+  const career=SAMPLE_OPPORTUNITIES.some(opportunity=>opportunity.careerSlug===careerParam)?careerParam:null;
   const records=SAMPLE_OPPORTUNITIES.filter(o=>(type==="ALL"||o.type===type)&&(!remote||o.isRemote)&&(!career||career===o.careerSlug)&&[o.title,o.description,o.locationCity,o.locationState].join(" ").toLowerCase().includes(query.toLowerCase()));
   return <div><div className="notice mb-8">Example listings only. These records are not confirmed vacancies, employer partnerships or open applications. Source names and dates illustrate the information a future listing would need.</div>
     <div className="grid md:grid-cols-[1fr_240px] gap-5 mb-5"><Input label="Search examples" type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Role, skill or location"/><label className="field-label">Opportunity type<select className="field mt-2" value={type} onChange={e=>setType(e.target.value)}><option value="ALL">All types</option>{OPPORTUNITY_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}</select></label></div>

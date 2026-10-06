@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const POPULAR_SEARCHES = [
-  { label: "Solar Inverter Tech", query: "solar" },
-  { label: "Network Cabling", query: "network" },
-  { label: "UI/UX Design", query: "ui/ux" },
-  { label: "Bespoke Fashion", query: "tailoring" },
-  { label: "Auto Diagnostics", query: "auto" },
-  { label: "Cybersecurity", query: "security" },
+  { label: "Solar Inverter Tech", career: "solar-energy-technician" },
+  { label: "Network Cabling", career: "network-technician" },
+  { label: "UI/UX Design", career: "ui-ux-designer" },
+  { label: "Bespoke Fashion", career: "fashion-designer-apparel-maker" },
+  { label: "Auto Diagnostics", career: "automotive-diagnostics-technician" },
+  { label: "Cybersecurity", career: "cybersecurity-analyst" },
 ];
 
 export function HeroSearch() {
@@ -25,8 +25,8 @@ export function HeroSearch() {
     router.push(`/explore?q=${encodeURIComponent(query.trim())}`);
   };
 
-  const handleQuickChip = (term: string) => {
-    router.push(`/explore?q=${encodeURIComponent(term)}`);
+  const handleQuickChip = (career: string) => {
+    router.push(`/explore?career=${encodeURIComponent(career)}`);
   };
 
   return (
@@ -62,11 +62,11 @@ export function HeroSearch() {
       {/* Quick Search Chips */}
       <div className="flex items-center gap-2 mt-3 flex-wrap">
         <span className="text-2xs font-bold  text-surface-400">Popular:</span>
-        {POPULAR_SEARCHES.map(({ label, query: chipQuery }) => (
+        {POPULAR_SEARCHES.map(({ label, career }) => (
           <button
             key={label}
             type="button"
-            onClick={() => handleQuickChip(chipQuery)}
+            onClick={() => handleQuickChip(career)}
             className="text-xs px-2.5 py-1 rounded-full bg-navy-800/80 hover:bg-navy-700 text-surface-300 hover:text-teal-300 border border-navy-700/80 transition-colors"
           >
             {label}
@@ -76,4 +76,3 @@ export function HeroSearch() {
     </div>
   );
 }
-

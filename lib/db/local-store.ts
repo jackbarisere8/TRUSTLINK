@@ -2,8 +2,8 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import type { Repository, JobAggregate, ProfileBundle, ProfileInput } from "./repository";
-import type { JobTermsRecord, NotificationIntentRecord, PublicJobProjection, PublicTransactionProjection, TrustEventRecord } from "./types";
+import type { Repository, JobAggregate, ProfileBundle, ProfileInput, AccountProfileInput, ProviderOnboardingInput } from "./repository";
+import type { JobTermsRecord, NotificationIntentRecord, ProviderProfileRecord, PublicJobProjection, PublicTransactionProjection, TrustEventRecord } from "./types";
 import { ConflictError } from "../domain/errors";
 import { publicEvents } from "../domain/trust-events";
 import { aggregateSchema, localDataSchema } from "./local-schema";
@@ -45,8 +45,23 @@ function legacyTrustEvents(records: unknown[]): TrustEventRecord[] {
 function upgradeLegacyRecords(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
   const root = value as Record<string,unknown>;
-  if (!Array.isArray(root.records)) return value;
-  const records = root.records.map(record => {
+  const profiles = Array.isArray(root.profiles) ? root.profiles.map(bundle => {
+    if (!bundle || typeof bundle !== "object") return bundle;
+    const next = { ...(bundle as Record<string,unknown>) };
+    if (!next.providerProfile || typeof next.providerProfile !== "object") return next;
+    const provider = { ...(next.providerProfile as Record<string,unknown>) };
+    const createdAt = typeof provider.createdAt === "string" ? provider.createdAt : new Date(0).toISOString();
+    next.providerProfile = {
+      marketplaceStatus: "NOT_LISTED",
+      remoteServices: false,
+      moderationStatus: "DRAFT",
+      bookingCapacity: 1,
+      updatedAt: createdAt,
+      ...provider,
+    };
+    return next;
+  }) : root.profiles;
+  const records = Array.isArray(root.records) ? root.records.map(record => {
       if (!record || typeof record !== "object") return record;
       const aggregate = record as Record<string,unknown>;
       if (!Array.isArray(aggregate.events)) return record;
@@ -135,12 +150,13 @@ function upgradeLegacyRecords(value: unknown): unknown {
           return next;
         }),
       };
-    });
+    }) : root.records;
   return {
     ...root,
+    profiles,
     records,
     notificationIntents: Array.isArray(root.notificationIntents) ? root.notificationIntents
-      : notificationIntentsForEvents(legacyTrustEvents(records)),
+      : notificationIntentsForEvents(legacyTrustEvents(Array.isArray(records) ? records : [])),
   };
 }
 
@@ -182,12 +198,47 @@ export class LocalStoreRepository implements Repository {
   }
   async getProfileByUsername(username: string) { return this.read().profiles.find(p => p.profile.username === username.toLowerCase()) || null; }
   async getProfileByUserId(userId: string) { return this.read().profiles.find(p => p.profile.userId === userId)?.profile || null; }
+  async getProfileBundleByUserId(userId: string) { return this.read().profiles.find(p => p.profile.userId === userId) || null; }
+  async updateAccountProfile(userId: string, input: AccountProfileInput) {
+    this.transaction(data => {
+      const bundle = data.profiles.find(item => item.profile.userId === userId);
+      if (!bundle) throw new Error("Profile not found");
+      Object.assign(bundle.profile, {
+        displayName: input.displayName,
+        country: input.country,
+        state: input.state || undefined,
+        city: input.city || undefined,
+      });
+    });
+  }
+  async enableProvider(userId: string, input: ProviderOnboardingInput): Promise<ProviderProfileRecord> {
+    return this.transaction(data => {
+      const bundle = data.profiles.find(item => item.profile.userId === userId);
+      if (!bundle) throw new Error("Profile not found");
+      if (bundle.providerProfile) return bundle.providerProfile;
+      const now = new Date().toISOString();
+      bundle.providerProfile = {
+        id: randomUUID(),
+        userId,
+        headline: input.headline,
+        serviceArea: input.serviceArea,
+        verificationStatus: "UNVERIFIED",
+        marketplaceStatus: "DRAFT",
+        remoteServices: false,
+        moderationStatus: "DRAFT",
+        bookingCapacity: 1,
+        createdAt: now,
+        updatedAt: now,
+      };
+      return bundle.providerProfile;
+    });
+  }
   async updateProfile(userId: string, input: ProfileInput) {
     this.transaction(data => {
       const p = data.profiles.find(p => p.profile.userId === userId);
       if (!p || !p.providerProfile) throw new Error("Provider profile not found");
       Object.assign(p.profile, { displayName: input.displayName, country: input.country, state: input.state, city: input.city });
-      if (p.providerProfile) Object.assign(p.providerProfile, { headline: input.headline, bio: input.bio, serviceArea: input.serviceArea });
+      if (p.providerProfile) Object.assign(p.providerProfile, { headline: input.headline, bio: input.bio || undefined, serviceArea: input.serviceArea, updatedAt: new Date().toISOString() });
     });
   }
   async getAggregate(id: string, byPublicId = false) { return this.read().records.find(a => byPublicId ? a.job.publicId === id : a.job.id === id) || null; }

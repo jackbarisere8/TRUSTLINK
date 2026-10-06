@@ -7,12 +7,21 @@ export interface UserSession {
   username: string;
   displayName: string;
   role: AccountRole;
+  providerEnabled: boolean;
 }
 
 export async function resolveUserSession(provider: AuthProvider, repository: Repository): Promise<UserSession | null> {
   const identity = await provider.currentIdentity();
   if (!identity) return null;
-  const applicationProfile = await repository.getProfileByUserId(identity.userId);
-  if (!applicationProfile || applicationProfile.userId !== identity.userId) return null;
-  return { ...identity, username: applicationProfile.username, displayName: applicationProfile.displayName };
+  const bundle = await repository.getProfileBundleByUserId(identity.userId);
+  if (!bundle || bundle.profile.userId !== identity.userId) return null;
+  const providerEnabled = bundle.providerProfile !== null;
+  const role: AccountRole = identity.role === "ADMIN" ? "ADMIN" : providerEnabled ? "PROVIDER" : "CUSTOMER";
+  return {
+    ...identity,
+    role,
+    providerEnabled,
+    username: bundle.profile.username,
+    displayName: bundle.profile.displayName,
+  };
 }

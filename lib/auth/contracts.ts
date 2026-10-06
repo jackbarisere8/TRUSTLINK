@@ -1,6 +1,8 @@
-export type AccountRole = "PROVIDER" | "ADMIN";
+export type AccountRole = "CUSTOMER" | "PROVIDER" | "ADMIN";
 export type AuthFailure = "UNAVAILABLE" | "REJECTED";
 export type AuthResult = { ok: true; session: boolean } | { ok: false; reason: AuthFailure };
+export type AuthOperationResult = { ok: true } | { ok: false; reason: AuthFailure };
+export type PasswordRecoverySession = { code: string } | { tokenHash: string };
 
 export interface AuthIdentity {
   userId: string;
@@ -11,7 +13,10 @@ export interface AuthIdentity {
 export interface AuthProvider {
   currentIdentity(): Promise<AuthIdentity | null>;
   signIn(input: { email: string; password: string }): Promise<AuthResult>;
-  signUp(input: { email: string; password: string; displayName: string; profession?: string }): Promise<AuthResult>;
+  signUp(input: { email: string; password: string; displayName: string }): Promise<AuthResult>;
+  requestPasswordReset(input: { email: string; redirectTo: string }): Promise<AuthOperationResult>;
+  establishPasswordRecovery(input: PasswordRecoverySession): Promise<AuthOperationResult>;
+  updatePassword(password: string): Promise<AuthOperationResult>;
   verifyEmail(tokenHash: string): Promise<boolean>;
   signOut(): Promise<void>;
 }
@@ -20,6 +25,9 @@ export const unconfiguredAuthProvider: AuthProvider = {
   currentIdentity: async () => null,
   signIn: async () => ({ ok: false, reason: "UNAVAILABLE" }),
   signUp: async () => ({ ok: false, reason: "UNAVAILABLE" }),
+  requestPasswordReset: async () => ({ ok: false, reason: "UNAVAILABLE" }),
+  establishPasswordRecovery: async () => ({ ok: false, reason: "UNAVAILABLE" }),
+  updatePassword: async () => ({ ok: false, reason: "UNAVAILABLE" }),
   verifyEmail: async () => false,
   signOut: async () => undefined,
 };

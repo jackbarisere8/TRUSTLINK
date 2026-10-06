@@ -14,12 +14,12 @@ function excerpt(value: string) {
   const plain = value.replace(/\s+/g, " ").trim();
   return plain.length > 220 ? plain.slice(0, 220).trimEnd() + "…" : plain;
 }
-
 export default async function Page({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
   const example = username === "amaka";
   const data = example ? null : await getProviderReputation(username);
   if (!example && !data) notFound();
+  if (!example && (!data!.providerProfile || !["NOT_LISTED", "PUBLISHED"].includes(data!.providerProfile.marketplaceStatus))) notFound();
 
   const name = example ? "Amaka Okafor" : data!.profile.displayName;
   const savedHeadline = data?.providerProfile?.headline || "";

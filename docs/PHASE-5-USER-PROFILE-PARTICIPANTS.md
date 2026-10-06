@@ -11,7 +11,7 @@ Implemented for the user's request to continue with Phase 5, September 21, 2026.
 | Provider profile | `ProviderProfileRecord` in `lib/db/types.ts` | Provider headline, biography, service area and provider-profile status |
 | Transaction participant | `TransactionParticipant` in `lib/domain/participants/index.ts` | A provider or client as a party to one transaction, with account/guest association and detail provenance |
 
-`ProfileBundle` groups an application profile with its optional provider profile for repository reads; it does not merge their meanings. `resolveUserSession()` starts with a validated Auth identity and separately loads the linked application profile. Provider profile fields never grant an account role.
+`ProfileBundle` groups an application profile with its optional provider profile for repository reads; it does not merge their meanings. `resolveUserSession()` starts with a validated Auth identity and loads that bundle. Provider fields never grant administrator access, but the presence of the optional provider row now enables the provider workspace as described in `PHASE-4-UNIFIED-ACCOUNTS.md`.
 
 ## Participant representation
 

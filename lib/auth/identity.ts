@@ -12,6 +12,8 @@ export function identityFromSupabaseUser(user: SupabaseUserShape): AuthIdentity 
   return {
     userId: user.id,
     email: user.email || "",
-    role: user.app_metadata?.role === "ADMIN" ? "ADMIN" : "PROVIDER",
+    // Provider access is an application capability derived from the presence of
+    // a provider_profiles row. Auth metadata may only grant the trusted admin role.
+    role: user.app_metadata?.role === "ADMIN" ? "ADMIN" : "CUSTOMER",
   };
 }

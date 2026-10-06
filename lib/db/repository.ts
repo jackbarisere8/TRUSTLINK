@@ -12,9 +12,14 @@ export interface JobAggregate {
 }
 export type ProfileBundle = { profile: ApplicationProfileRecord; providerProfile: ProviderProfileRecord | null };
 export type ProfileInput = { displayName: string; country: string; state: string; city: string; headline: string; bio: string; serviceArea: string };
+export type AccountProfileInput = { displayName: string; country: string; state: string; city: string };
+export type ProviderOnboardingInput = { headline: string; serviceArea: string };
 export interface Repository {
   getProfileByUsername(username: string): Promise<ProfileBundle | null>;
   getProfileByUserId(userId: string): Promise<ApplicationProfileRecord | null>;
+  getProfileBundleByUserId(userId: string): Promise<ProfileBundle | null>;
+  updateAccountProfile(userId: string, input: AccountProfileInput): Promise<void>;
+  enableProvider(userId: string, input: ProviderOnboardingInput): Promise<ProviderProfileRecord>;
   updateProfile(userId: string, input: ProfileInput): Promise<void>;
   getAggregate(id: string, byPublicId?: boolean): Promise<JobAggregate | null>;
   /** Narrow public record plus allowlisted, redacted lifecycle history. */

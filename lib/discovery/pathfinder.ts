@@ -95,7 +95,7 @@ export const PATHFINDER_QUESTIONS = [
       {
         value: "graduate_career_change",
         label: "Graduate or working professional seeking transition",
-        hint: "Looking for high-demand pathways with fast economic return",
+        hint: "Looking for pathways that may support independent paid work",
       },
     ],
   },
@@ -111,7 +111,7 @@ export const PATHFINDER_QUESTIONS = [
       },
       {
         value: "freelance_clients",
-        label: "Work independently with direct clients via TrustLink",
+        label: "Work independently with direct clients",
         hint: "Bespoke trades, design, web creation, independent contracts",
       },
       {
@@ -187,7 +187,7 @@ export function calculatePathfinderRecommendations(
     if (answers.goal === "freelance_clients") {
       if (career.slug === "ui-ux-designer" || career.slug === "fashion-designer-apparel-maker" || career.slug === "solar-energy-technician") {
         score += 20;
-        reasons.push("Offers high independent client demand where you can structure jobs directly with TrustLink.");
+        reasons.push("Can involve independent client work where written scope and delivery records may be useful.");
       }
     } else if (answers.goal === "employable_fast") {
       if (career.entryRoutes.some((r) => r.typicalDuration.includes("6") || r.typicalDuration.includes("3"))) {
@@ -196,7 +196,7 @@ export function calculatePathfinderRecommendations(
       }
     }
 
-    let firstStep = "Explore foundational concepts and review real project specifications on TrustLink.";
+    let firstStep = "Explore foundational concepts and review the pilot practice outlines.";
     if (career.entryRoutes.length > 0) {
       firstStep = `Start with the ${career.entryRoutes[0].title} pathway (${career.entryRoutes[0].typicalDuration}).`;
     }

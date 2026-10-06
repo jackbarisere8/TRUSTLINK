@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { requireProvider } from "@/lib/auth";
 import { db } from "@/lib/db";
 import type { JobStatus, JobSummaryRecord } from "@/lib/db/types";
 import { dateLabel } from "@/lib/format";
@@ -24,7 +24,7 @@ function service(job: JobSummaryRecord) {
 }
 
 export default async function Page() {
-  const user = await requireUser();
+  const user = await requireProvider();
   const jobs = await db.listJobs(user.userId);
   const recentJobs = [...jobs].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   const active = recentJobs.filter(job => !["COMPLETED", "CANCELLED"].includes(job.status));

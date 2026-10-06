@@ -6,6 +6,240 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      booking_events: {
+        Row: {
+          id: string;
+          booking_id: string;
+          event_sequence: number;
+          actor_id: string;
+          actor_type: string;
+          event_type: string;
+          request_id: string | null;
+          command_hash: string | null;
+          expected_version: number | null;
+          metadata: Json;
+          occurred_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          booking_id: string;
+          event_sequence: number;
+          actor_id: string;
+          actor_type: string;
+          event_type: string;
+          request_id?: string | null;
+          command_hash?: string | null;
+          expected_version?: number | null;
+          metadata?: Json;
+          occurred_at: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          booking_id?: string;
+          event_sequence?: number;
+          actor_id?: string;
+          actor_type?: string;
+          event_type?: string;
+          request_id?: string | null;
+          command_hash?: string | null;
+          expected_version?: number | null;
+          metadata?: Json;
+          occurred_at?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_events_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "booking_requests";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      booking_requests: {
+        Row: {
+          id: string;
+          public_id: string;
+          customer_id: string;
+          provider_id: string;
+          provider_service_id: string;
+          request_text: string;
+          requested_start: string;
+          requested_end: string;
+          timezone: string;
+          duration_minutes: number;
+          location_mode: string;
+          state_code: string | null;
+          lga_code: string | null;
+          broad_area: string | null;
+          private_address: string | null;
+          budget_min: number | null;
+          budget_max: number | null;
+          currency: string;
+          status: string;
+          version: number;
+          expires_at: string;
+          linked_job_id: string | null;
+          hold_expires_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          public_id: string;
+          customer_id: string;
+          provider_id: string;
+          provider_service_id: string;
+          request_text: string;
+          requested_start: string;
+          requested_end: string;
+          timezone?: string;
+          duration_minutes: number;
+          location_mode: string;
+          state_code?: string | null;
+          lga_code?: string | null;
+          broad_area?: string | null;
+          private_address?: string | null;
+          budget_min?: number | null;
+          budget_max?: number | null;
+          currency?: string;
+          status?: string;
+          version?: number;
+          expires_at: string;
+          linked_job_id?: string | null;
+          hold_expires_at?: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Update: {
+          id?: string;
+          public_id?: string;
+          customer_id?: string;
+          provider_id?: string;
+          provider_service_id?: string;
+          request_text?: string;
+          requested_start?: string;
+          requested_end?: string;
+          timezone?: string;
+          duration_minutes?: number;
+          location_mode?: string;
+          state_code?: string | null;
+          lga_code?: string | null;
+          broad_area?: string | null;
+          private_address?: string | null;
+          budget_min?: number | null;
+          budget_max?: number | null;
+          currency?: string;
+          status?: string;
+          version?: number;
+          expires_at?: string;
+          linked_job_id?: string | null;
+          hold_expires_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_lga_state_fk";
+            columns: ["lga_code","state_code"];
+            isOneToOne: false;
+            referencedRelation: "nigeria_lgas";
+            referencedColumns: ["code","state_code"];
+          },
+          {
+            foreignKeyName: "booking_requests_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "booking_requests_linked_job_id_fkey";
+            columns: ["linked_job_id"];
+            isOneToOne: true;
+            referencedRelation: "jobs";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_requests_provider_id_fkey";
+            columns: ["provider_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_profiles";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "booking_requests_state_code_fkey";
+            columns: ["state_code"];
+            isOneToOne: false;
+            referencedRelation: "nigeria_states";
+            referencedColumns: ["code"];
+          },
+          {
+            foreignKeyName: "booking_service_owner_fk";
+            columns: ["provider_service_id","provider_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_services";
+            referencedColumns: ["id","provider_id"];
+          }
+        ];
+      };
+      booking_slot_holds: {
+        Row: {
+          id: string;
+          booking_id: string;
+          provider_id: string;
+          starts_at: string;
+          ends_at: string;
+          status: string;
+          expires_at: string | null;
+          created_at: string;
+          updated_at: string;
+          released_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          booking_id: string;
+          provider_id: string;
+          starts_at: string;
+          ends_at: string;
+          status: string;
+          expires_at?: string | null;
+          created_at: string;
+          updated_at: string;
+          released_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          booking_id?: string;
+          provider_id?: string;
+          starts_at?: string;
+          ends_at?: string;
+          status?: string;
+          expires_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          released_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_slot_holds_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: true;
+            referencedRelation: "booking_requests";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_slot_holds_provider_id_fkey";
+            columns: ["provider_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_profiles";
+            referencedColumns: ["user_id"];
+          }
+        ];
+      };
       deliveries: {
         Row: {
           id: string;
@@ -328,6 +562,108 @@ export type Database = {
           }
         ];
       };
+      marketplace_settings: {
+        Row: {
+          singleton: boolean;
+          booking_request_ttl: unknown;
+          slot_hold_ttl: unknown;
+          updated_at: string;
+        };
+        Insert: {
+          singleton?: boolean;
+          booking_request_ttl?: unknown;
+          slot_hold_ttl?: unknown;
+          updated_at?: string;
+        };
+        Update: {
+          singleton?: boolean;
+          booking_request_ttl?: unknown;
+          slot_hold_ttl?: unknown;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      nigeria_lgas: {
+        Row: {
+          code: string;
+          state_code: string;
+          name: string;
+          kind: string;
+          release_id: string;
+          active: boolean;
+        };
+        Insert: {
+          code: string;
+          state_code: string;
+          name: string;
+          kind: string;
+          release_id: string;
+          active?: boolean;
+        };
+        Update: {
+          code?: string;
+          state_code?: string;
+          name?: string;
+          kind?: string;
+          release_id?: string;
+          active?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "nigeria_lgas_release_id_fkey";
+            columns: ["release_id"];
+            isOneToOne: false;
+            referencedRelation: "reference_data_releases";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "nigeria_lgas_release_state_fk";
+            columns: ["state_code","release_id"];
+            isOneToOne: false;
+            referencedRelation: "nigeria_states";
+            referencedColumns: ["code","release_id"];
+          },
+          {
+            foreignKeyName: "nigeria_lgas_state_code_fkey";
+            columns: ["state_code"];
+            isOneToOne: false;
+            referencedRelation: "nigeria_states";
+            referencedColumns: ["code"];
+          }
+        ];
+      };
+      nigeria_states: {
+        Row: {
+          code: string;
+          name: string;
+          kind: string;
+          release_id: string;
+          active: boolean;
+        };
+        Insert: {
+          code: string;
+          name: string;
+          kind: string;
+          release_id: string;
+          active?: boolean;
+        };
+        Update: {
+          code?: string;
+          name?: string;
+          kind?: string;
+          release_id?: string;
+          active?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "nigeria_states_release_id_fkey";
+            columns: ["release_id"];
+            isOneToOne: false;
+            referencedRelation: "reference_data_releases";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       notification_intents: {
         Row: {
           id: string;
@@ -464,6 +800,60 @@ export type Database = {
           }
         ];
       };
+      provider_availability_rules: {
+        Row: {
+          id: string;
+          provider_id: string;
+          provider_service_id: string | null;
+          day_of_week: number;
+          local_start: string;
+          local_end: string;
+          timezone: string;
+          effective_from: string | null;
+          effective_to: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          provider_service_id?: string | null;
+          day_of_week: number;
+          local_start: string;
+          local_end: string;
+          timezone?: string;
+          effective_from?: string | null;
+          effective_to?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          provider_service_id?: string | null;
+          day_of_week?: number;
+          local_start?: string;
+          local_end?: string;
+          timezone?: string;
+          effective_from?: string | null;
+          effective_to?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "provider_availability_rules_provider_id_fkey";
+            columns: ["provider_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_profiles";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "provider_availability_service_owner_fk";
+            columns: ["provider_service_id","provider_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_services";
+            referencedColumns: ["id","provider_id"];
+          }
+        ];
+      };
       provider_profiles: {
         Row: {
           id: string;
@@ -474,6 +864,13 @@ export type Database = {
           verification_status: string;
           created_at: string;
           updated_at: string;
+          marketplace_status: string;
+          business_name: string | null;
+          remote_services: boolean;
+          booking_policy: string | null;
+          moderation_status: string;
+          published_at: string | null;
+          booking_capacity: number;
         };
         Insert: {
           id?: string;
@@ -484,6 +881,13 @@ export type Database = {
           verification_status?: string;
           created_at?: string;
           updated_at?: string;
+          marketplace_status?: string;
+          business_name?: string | null;
+          remote_services?: boolean;
+          booking_policy?: string | null;
+          moderation_status?: string;
+          published_at?: string | null;
+          booking_capacity?: number;
         };
         Update: {
           id?: string;
@@ -494,6 +898,13 @@ export type Database = {
           verification_status?: string;
           created_at?: string;
           updated_at?: string;
+          marketplace_status?: string;
+          business_name?: string | null;
+          remote_services?: boolean;
+          booking_policy?: string | null;
+          moderation_status?: string;
+          published_at?: string | null;
+          booking_capacity?: number;
         };
         Relationships: [
           {
@@ -504,6 +915,277 @@ export type Database = {
             referencedColumns: ["user_id"];
           }
         ];
+      };
+      provider_service_areas: {
+        Row: {
+          id: string;
+          provider_id: string;
+          provider_service_id: string | null;
+          state_code: string | null;
+          lga_code: string | null;
+          remote_service: boolean;
+          approximate_origin: string | null;
+          radius_km: number | null;
+          created_at: string;
+          origin_latitude: number | null;
+          origin_longitude: number | null;
+          origin_consented_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          provider_service_id?: string | null;
+          state_code?: string | null;
+          lga_code?: string | null;
+          remote_service?: boolean;
+          approximate_origin?: string | null;
+          radius_km?: number | null;
+          created_at?: string;
+          origin_latitude?: number | null;
+          origin_longitude?: number | null;
+          origin_consented_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          provider_service_id?: string | null;
+          state_code?: string | null;
+          lga_code?: string | null;
+          remote_service?: boolean;
+          approximate_origin?: string | null;
+          radius_km?: number | null;
+          created_at?: string;
+          origin_latitude?: number | null;
+          origin_longitude?: number | null;
+          origin_consented_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "provider_service_areas_lga_state_fk";
+            columns: ["lga_code","state_code"];
+            isOneToOne: false;
+            referencedRelation: "nigeria_lgas";
+            referencedColumns: ["code","state_code"];
+          },
+          {
+            foreignKeyName: "provider_service_areas_provider_id_fkey";
+            columns: ["provider_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_profiles";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "provider_service_areas_service_owner_fk";
+            columns: ["provider_service_id","provider_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_services";
+            referencedColumns: ["id","provider_id"];
+          },
+          {
+            foreignKeyName: "provider_service_areas_state_code_fkey";
+            columns: ["state_code"];
+            isOneToOne: false;
+            referencedRelation: "nigeria_states";
+            referencedColumns: ["code"];
+          }
+        ];
+      };
+      provider_service_durations: {
+        Row: {
+          id: string;
+          provider_service_id: string;
+          duration_minutes: number;
+          label: string | null;
+          sort_order: number;
+        };
+        Insert: {
+          id?: string;
+          provider_service_id: string;
+          duration_minutes: number;
+          label?: string | null;
+          sort_order?: number;
+        };
+        Update: {
+          id?: string;
+          provider_service_id?: string;
+          duration_minutes?: number;
+          label?: string | null;
+          sort_order?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "provider_service_durations_provider_service_id_fkey";
+            columns: ["provider_service_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_services";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      provider_services: {
+        Row: {
+          id: string;
+          provider_id: string;
+          service_definition_id: string;
+          public_title: string;
+          description: string;
+          pricing_model: string;
+          price_min: number | null;
+          price_max: number | null;
+          currency: string;
+          supports_remote: boolean;
+          supports_onsite: boolean;
+          status: string;
+          published_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          service_definition_id: string;
+          public_title: string;
+          description: string;
+          pricing_model: string;
+          price_min?: number | null;
+          price_max?: number | null;
+          currency?: string;
+          supports_remote?: boolean;
+          supports_onsite?: boolean;
+          status?: string;
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          service_definition_id?: string;
+          public_title?: string;
+          description?: string;
+          pricing_model?: string;
+          price_min?: number | null;
+          price_max?: number | null;
+          currency?: string;
+          supports_remote?: boolean;
+          supports_onsite?: boolean;
+          status?: string;
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "provider_services_provider_id_fkey";
+            columns: ["provider_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_profiles";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "provider_services_service_definition_id_fkey";
+            columns: ["service_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "service_definitions";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      provider_unavailability: {
+        Row: {
+          id: string;
+          provider_id: string;
+          starts_at: string;
+          ends_at: string;
+          reason: string | null;
+          source: string;
+          job_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          starts_at: string;
+          ends_at: string;
+          reason?: string | null;
+          source?: string;
+          job_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          starts_at?: string;
+          ends_at?: string;
+          reason?: string | null;
+          source?: string;
+          job_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "provider_unavailability_job_id_fkey";
+            columns: ["job_id"];
+            isOneToOne: false;
+            referencedRelation: "jobs";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "provider_unavailability_provider_id_fkey";
+            columns: ["provider_id"];
+            isOneToOne: false;
+            referencedRelation: "provider_profiles";
+            referencedColumns: ["user_id"];
+          }
+        ];
+      };
+      reference_data_releases: {
+        Row: {
+          id: string;
+          title: string;
+          publisher: string;
+          landing_page: string;
+          download_url: string;
+          license: string;
+          source_valid_on: string;
+          retrieved_at: string;
+          source_sha256: string;
+          normalized_sha256: string;
+          state_count: number;
+          lga_count: number;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          title: string;
+          publisher: string;
+          landing_page: string;
+          download_url: string;
+          license: string;
+          source_valid_on: string;
+          retrieved_at: string;
+          source_sha256: string;
+          normalized_sha256: string;
+          state_count: number;
+          lga_count: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          publisher?: string;
+          landing_page?: string;
+          download_url?: string;
+          license?: string;
+          source_valid_on?: string;
+          retrieved_at?: string;
+          source_sha256?: string;
+          normalized_sha256?: string;
+          state_count?: number;
+          lga_count?: number;
+          created_at?: string;
+        };
+        Relationships: [];
       };
       reviews: {
         Row: {
@@ -578,6 +1260,97 @@ export type Database = {
           }
         ];
       };
+      service_categories: {
+        Row: {
+          id: string;
+          slug: string;
+          name: string;
+          parent_id: string | null;
+          description: string | null;
+          active: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          slug: string;
+          name: string;
+          parent_id?: string | null;
+          description?: string | null;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          slug?: string;
+          name?: string;
+          parent_id?: string | null;
+          description?: string | null;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "service_categories_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "service_categories";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      service_definitions: {
+        Row: {
+          id: string;
+          category_id: string;
+          slug: string;
+          name: string;
+          description: string | null;
+          approved_aliases: string[];
+          active: boolean;
+          moderation_status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          category_id: string;
+          slug: string;
+          name: string;
+          description?: string | null;
+          approved_aliases?: string[];
+          active?: boolean;
+          moderation_status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          category_id?: string;
+          slug?: string;
+          name?: string;
+          description?: string | null;
+          approved_aliases?: string[];
+          active?: boolean;
+          moderation_status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "service_definitions_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "service_categories";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       trust_events: {
         Row: {
           id: string;
@@ -644,6 +1417,31 @@ export type Database = {
         };
         Relationships: [];
       };
+      public_marketplace_services: {
+        Row: {
+          service_id: string | null;
+          provider_username: string | null;
+          provider_name: string | null;
+          provider_headline: string | null;
+          provider_bio: string | null;
+          service_slug: string | null;
+          service_name: string | null;
+          category_slug: string | null;
+          category_name: string | null;
+          public_title: string | null;
+          description: string | null;
+          pricing_model: string | null;
+          price_min: number | null;
+          price_max: number | null;
+          currency: string | null;
+          supports_remote: boolean | null;
+          supports_onsite: boolean | null;
+          durations: Json | null;
+          service_areas: Json | null;
+          availability: Json | null;
+        };
+        Relationships: [];
+      };
       public_transaction_events: {
         Row: {
           public_id: string | null;
@@ -656,6 +1454,20 @@ export type Database = {
       };
     };
     Functions: {
+      tl_add_provider_blackout: {
+        Args: {
+          p_provider_id: string | null;
+          p_input: Json | null;
+        };
+        Returns: Json;
+      };
+      tl_archive_provider_service: {
+        Args: {
+          p_provider_id: string | null;
+          p_service_id: string | null;
+        };
+        Returns: Json;
+      };
       tl_assert_job_participants: {
         Args: {
           p_job_id: string | null;
@@ -669,10 +1481,95 @@ export type Database = {
         };
         Returns: undefined;
       };
+      tl_convert_booking: {
+        Args: {
+          p_booking_id: string | null;
+          p_provider_id: string | null;
+          p_expected_version: number | null;
+          p_request_id: string | null;
+          p_command_hash: string | null;
+          p_job_record: Json | null;
+          p_occurred_at: string | null;
+        };
+        Returns: Json;
+      };
+      tl_create_booking: {
+        Args: {
+          p_record: Json | null;
+          p_actor_id: string | null;
+          p_request_id: string | null;
+          p_command_hash: string | null;
+        };
+        Returns: Json;
+      };
+      tl_delete_provider_blackout: {
+        Args: {
+          p_provider_id: string | null;
+          p_blackout_id: string | null;
+        };
+        Returns: undefined;
+      };
+      tl_enable_provider: {
+        Args: {
+          p_user_id: string | null;
+          p_input: Json | null;
+        };
+        Returns: Json;
+      };
+      tl_expire_bookings: {
+        Args: {
+          p_now: string | null;
+        };
+        Returns: number;
+      };
+      tl_list_bookings: {
+        Args: {
+          p_actor_id: string | null;
+          p_actor_type: string | null;
+        };
+        Returns: Json;
+      };
+      tl_read_booking: {
+        Args: {
+          p_booking_id: string | null;
+          p_actor_id: string | null;
+          p_actor_type: string | null;
+        };
+        Returns: Json;
+      };
       tl_read_job: {
         Args: {
           p_id: string | null;
           p_public: boolean | null;
+        };
+        Returns: Json;
+      };
+      tl_replace_provider_availability: {
+        Args: {
+          p_provider_id: string | null;
+          p_rules: Json | null;
+        };
+        Returns: Json;
+      };
+      tl_search_marketplace_services: {
+        Args: {
+          p_input: Json | null;
+        };
+        Returns: Json;
+      };
+      tl_set_provider_publication: {
+        Args: {
+          p_provider_id: string | null;
+          p_publish: boolean | null;
+        };
+        Returns: Json;
+      };
+      tl_set_provider_service_origin: {
+        Args: {
+          p_provider_id: string | null;
+          p_service_id: string | null;
+          p_latitude: number | null;
+          p_longitude: number | null;
         };
         Returns: Json;
       };
@@ -682,12 +1579,40 @@ export type Database = {
         };
         Returns: Json;
       };
+      tl_transition_booking: {
+        Args: {
+          p_booking_id: string | null;
+          p_actor_id: string | null;
+          p_actor_type: string | null;
+          p_next_status: string | null;
+          p_expected_version: number | null;
+          p_request_id: string | null;
+          p_command_hash: string | null;
+          p_occurred_at: string | null;
+        };
+        Returns: Json;
+      };
+      tl_update_account_profile: {
+        Args: {
+          p_user_id: string | null;
+          p_input: Json | null;
+        };
+        Returns: undefined;
+      };
       tl_update_profile: {
         Args: {
           p_user_id: string | null;
           p_input: Json | null;
         };
         Returns: undefined;
+      };
+      tl_upsert_provider_service: {
+        Args: {
+          p_provider_id: string | null;
+          p_service_id: string | null;
+          p_input: Json | null;
+        };
+        Returns: Json;
       };
       uuid_generate_v4: {
         Args: Record<string, never>;

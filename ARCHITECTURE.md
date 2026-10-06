@@ -44,7 +44,12 @@
 /dashboard/jobs
 /dashboard/jobs/new
 /dashboard/jobs/[id]
+/dashboard/services
+/dashboard/services/new
+/dashboard/services/[id]/edit
+/dashboard/availability
 /dashboard/profile
+/dashboard/profile/preview
 /dashboard/settings
 
 /j/[publicId]               PUBLIC — no login. Highest-priority page in the product.
@@ -59,7 +64,7 @@
 /admin/events
 ```
 
-No `/marketplace`, `/search`, or `/find-providers` routes exist in V0.1. See `AGENT.md`.
+Public discovery is available at `/providers`; the homepage leads into the same server-backed search. Booking-request creation is intentionally absent until Phase 7. There are no alternate `/marketplace`, `/search`, or `/find-providers` routes.
 
 ## 3. Component structure
 
@@ -82,6 +87,10 @@ components/
 Current Phase 3 implementation: UI mutations call Server Actions, which resolve the actor and call `lib/domain/transactions/index.ts` (`TransactionService`) or `lib/domain/profiles/index.ts`. Services accept `lib/db/repository.ts`; `lib/db/local-store.ts` and `lib/db/supabase.ts` are independent adapters. `TRUSTLINK_STORAGE` must explicitly select `local` or `supabase`; production requires complete Supabase configuration. No hosted project is configured in this workspace.
 
 The canonical lifecycle declaration is `lib/domain/transactions/policy.ts`; `state-machine.ts` authorizes and applies it. The UI imports `isActionAvailable()` from this policy for visibility, but this never replaces server authorization. Acceptance and commands require operation UUIDs and reviewed versions. Acceptance additionally records the exact immutable agreement snapshot in `JOB_ACCEPTED`; submitted client details remain self-provided, not verified identity. Domain folders also cover jobs, participants, payments, deliveries, revisions, disputes, reviews and trust-events. `lib/domain/jobs.ts` is a compatibility re-export only. The older broad folder outline below is historical, not a list of completed services. See `docs/PHASE-3-CANONICAL-STATE-MACHINE.md`, `docs/PHASE-12-CLIENT-CAPABILITY.md`, and `docs/PHASE-13-CLIENT-ACCEPTANCE.md` for evidence and limits.
+
+Phase 5 provider marketplace configuration lives in `lib/domain/provider-marketplace`, with its server-only Supabase adapter in `lib/db/provider-marketplace.ts`. Server Actions derive provider identity from the validated session; owner-scoped RPCs repeat authorization and critical validation at the database boundary. The public projection contains only published services and broad service-area information. Public search and customer booking pages are not part of this phase. See `docs/PHASE-5-PROVIDER-SERVICES-AVAILABILITY.md`.
+
+Phase 6 provider discovery lives in `lib/domain/provider-search`, with local reference behavior and the server-only Supabase search adapter in `lib/db/provider-search.ts`. Public filters are validated URL state. Visitor geolocation is sent only after an explicit browser permission action and remains transient; private provider origins are read only inside the service-role RPC, which returns rounded distance without coordinates. See `docs/PHASE-6-PROVIDER-SEARCH.md`.
 
 Job creation is a provider-only Server Action and service operation. The browser preview and service share the same Zod field contract; the server derives provider identity and location from the validated session/profile, generates an opaque 96-bit public ID, builds immutable terms and the `JOB_CREATED`/`JOB_SENT` pair, and commits the aggregate atomically. PostgreSQL creates the provider and guest-client participant rows in that transaction and rejects malformed initial state, identifiers, capabilities, terms, evidence collections or creation events. The client capability is a hashed 256-bit random bearer value with a 30-day expiry; its private-link fragment is exchanged for an HTTP-only cookie only after a server-side check. A valid client can then accept the reviewed SENT record once, preserving the agreement snapshot and self-provided participant details. See `docs/PHASE-10-REAL-JOB-CREATION.md`, `docs/PHASE-12-CLIENT-CAPABILITY.md`, and `docs/PHASE-13-CLIENT-ACCEPTANCE.md`.
 
@@ -198,7 +207,7 @@ V0.1's implementation returns `{ protectedFunds: false, authorization: false, pa
 
 `lib/auth/contracts.ts` is the application authentication boundary. In Supabase mode it delegates email/password login, signup, email confirmation, validated identity lookup and logout to Supabase Auth SSR. In local mode the explicit unconfigured provider never authenticates; there is no alternate password/session system or development dashboard bypass.
 
-Account actors are `PROVIDER` or `ADMIN`. The server calls Supabase `getUser()`, then requires a linked application profile. Administrator role comes only from trusted Auth `app_metadata`; editable `user_metadata` cannot grant it. A client uses a scoped, expiring `CLIENT_PARTICIPANT` capability rather than an account. A client link's fragment is exchanged for an HTTP-only session cookie only after the server validates its exact transaction hash and expiry; rotation and revocation invalidate the earlier capability. Actor identity comes from the server-validated session or capability, never a submitted ID. The proxy refreshes cookies but protected pages, actions and data access authorize independently. Magic-link login, password recovery, MFA and social login are not implemented. See `docs/PHASE-4-AUTHENTICATION-ARCHITECTURE.md` and `docs/PHASE-12-CLIENT-CAPABILITY.md`.
+Account actors are `CUSTOMER`, `PROVIDER`, or `ADMIN`. The server calls Supabase `getUser()`, then requires a linked application profile. Administrator role comes only from trusted Auth `app_metadata`; editable `user_metadata` cannot grant it. Provider access is an optional application capability derived from the presence of a `provider_profiles` row, so one non-admin identity can use both customer and provider workspaces. A guest client may still use a scoped, expiring `CLIENT_PARTICIPANT` capability without an account. A client link's fragment is exchanged for an HTTP-only session cookie only after the server validates its exact transaction hash and expiry; rotation and revocation invalidate the earlier capability. Actor identity comes from the server-validated session or capability, never a submitted ID. The proxy refreshes cookies but protected pages, actions and data access authorize independently. Password recovery is implemented; magic-link login, MFA and social login are not. See `docs/PHASE-4-AUTHENTICATION-ARCHITECTURE.md`, `docs/PHASE-4-UNIFIED-ACCOUNTS.md`, and `docs/PHASE-12-CLIENT-CAPABILITY.md`.
 
 Auth identity, application profile, provider profile and transaction participant are separate models. `AuthIdentity` contains the validated account principal; `ApplicationProfileRecord` supplies application presentation; `ProviderProfileRecord` supplies provider-specific fields; `TransactionParticipant` represents a provider or client inside one transaction. A client can remain a guest authorized by the scoped capability. Acceptance records its contact provenance as `SELF_PROVIDED`, not verified identity, and locks those details through the matching `JOB_ACCEPTED` transition. `EMAIL_VERIFIED` and `OTHER_VERIFIED` are reserved typed values with no current emitting workflow. Participant contact details are available only in authorized workspaces and remain absent from `PublicJobProjection`. See `docs/PHASE-5-USER-PROFILE-PARTICIPANTS.md` and `docs/PHASE-13-CLIENT-ACCEPTANCE.md`.
 

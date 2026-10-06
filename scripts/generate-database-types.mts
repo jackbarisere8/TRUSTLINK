@@ -21,6 +21,11 @@ const migrations = [
   "supabase/migrations/20260926000001_reviews_trust_profile.sql",
   "supabase/migrations/20260927000000_transaction_notifications.sql",
   "supabase/migrations/20260927000001_validation_analytics.sql",
+  "supabase/migrations/20261005000000_marketplace_booking_foundation.sql",
+  "supabase/migrations/20261005000001_nigeria_admin_seed.sql",
+  "supabase/migrations/20261005000002_unified_accounts.sql",
+  "supabase/migrations/20261005000003_provider_services_availability.sql",
+  "supabase/migrations/20261005000004_provider_search.sql",
 ];
 
 type Column = {

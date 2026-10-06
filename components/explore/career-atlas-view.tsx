@@ -21,8 +21,28 @@ const ALL_CATEGORIES: ("All" | CareerCategory)[] = [
 
 export function CareerAtlasView() {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("cat") || "All";
-  const initialQuery = searchParams.get("q") || "";
+  return (
+    <CareerAtlasState
+      key={searchParams.toString()}
+      requestedCategory={searchParams.get("cat")}
+      requestedCareer={searchParams.get("career")}
+      requestedQuery={searchParams.get("q")}
+    />
+  );
+}
+
+function CareerAtlasState({
+  requestedCategory,
+  requestedCareer,
+  requestedQuery,
+}: {
+  requestedCategory: string | null;
+  requestedCareer: string | null;
+  requestedQuery: string | null;
+}) {
+  const linkedCareer = CAREER_TAXONOMY.find(career => career.slug === requestedCareer);
+  const initialCategory = ALL_CATEGORIES.includes(requestedCategory as "All" | CareerCategory) ? requestedCategory! : "All";
+  const initialQuery = requestedQuery || linkedCareer?.title || "";
 
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>(initialQuery);
@@ -65,7 +85,7 @@ export function CareerAtlasView() {
             Unsure which trade or tech pathway suits your strengths?
           </h2>
           <p className="text-xs sm:text-sm text-surface-300 leading-relaxed">
-            Take the interactive Pathfinder questionnaire. We evaluate your natural curiosity, physical work style, and current education level against real Nigerian economic demand.
+            Use the pilot questionnaire to compare your answers with a small editorial set of work styles. It does not measure labour demand or predict career outcomes.
           </p>
         </div>
         <Button
@@ -179,21 +199,10 @@ export function CareerAtlasView() {
                 </p>
               </div>
 
-              {/* Key Highlights */}
+              {/* Tool preview */}
               <div className="space-y-2 py-3 border-y border-surface-100 text-xs">
-                <div className="space-y-0.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-surface-400 font-medium">Typical reported range:</span>
-                    <span className="font-semibold text-navy-900 font-mono">
-                      {career.typicalIncomeRange}
-                    </span>
-                  </div>
-                  <p className="text-2xs text-surface-400 italic">
-                    *Informational estimate; varies by location, experience &amp; employer.
-                  </p>
-                </div>
                 <div className="flex items-start justify-between gap-2 pt-1">
-                  <span className="text-surface-400 font-medium flex-shrink-0">Essential tools:</span>
+                  <span className="text-surface-400 font-medium flex-shrink-0">Example tools:</span>
                   <span className="text-right text-surface-600 truncate">
                     {career.toolsRequired.slice(0, 2).join(", ")}
                   </span>
@@ -229,7 +238,7 @@ export function CareerAtlasView() {
                 href={`/opportunities?career=${career.slug}`}
                 className="border-b border-[#b6c6c9] pb-1 text-2xs font-semibold text-navy-900 hover:border-teal-700"
               >
-                Find Gigs &amp; Jobs
+                View opportunity examples
               </Link>
             </div>
           </article>
@@ -291,36 +300,14 @@ export function CareerAtlasView() {
               </p>
             </div>
 
-            {/* Nigerian Income & Trend Signal */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-surface-50 border border-surface-200">
-              <div>
-                <p className="text-2xs font-bold  text-surface-400">
-                  Typical Reported Range (Informational Estimate)
-                </p>
-                <p className="text-base font-semibold text-teal-700 font-mono mt-0.5">
-                  {activeCareerModal.typicalIncomeRange}
-                </p>
-                <p className="text-2xs text-surface-500 mt-1 italic">
-                  Editorial estimate, not independently verified. Actual pay varies by location, experience and employer.
-                </p>
-              </div>
-              <div>
-                <p className="text-2xs font-bold  text-surface-400">
-                  Empirical Trend Signal
-                </p>
-                <p className="text-xs text-navy-900 mt-0.5">
-                  {activeCareerModal.trendSignal.summary}
-                </p>
-                <p className="text-2xs text-surface-500 mt-1">
-                  Unverified source reference: {activeCareerModal.trendSignal.source} ({activeCareerModal.trendSignal.date})
-                </p>
-              </div>
+            <div className="notice">
+              Editorial pilot content only. TrustLink has not verified earnings, demand, employers, training providers, qualifications, or placement availability.
             </div>
 
             {/* Workday Tasks */}
             <div className="space-y-2">
               <h3 className="text-xs font-bold  text-navy-900">
-                What a Real Workday Looks Like
+                Example day-to-day tasks
               </h3>
               <ul className="space-y-1.5 text-sm text-surface-600 list-disc pl-5">
                 {activeCareerModal.workdayTasks.map((t, idx) => (
@@ -332,7 +319,7 @@ export function CareerAtlasView() {
             {/* Entry Routes */}
             <div className="space-y-3">
               <h3 className="text-xs font-bold  text-navy-900">
-                Real Starting Routes in Nigeria
+                Possible starting routes to verify independently
               </h3>
               <div className="space-y-2.5">
                 {activeCareerModal.entryRoutes.map((route, idx) => (
@@ -350,7 +337,7 @@ export function CareerAtlasView() {
             {/* Required Tools */}
             <div className="space-y-2">
               <h3 className="text-xs font-bold  text-navy-900">
-                Essential Tools You Need to Master
+                Tools commonly associated with this work
               </h3>
               <div className="flex flex-wrap gap-2">
                 {activeCareerModal.toolsRequired.map((tool, idx) => (
@@ -378,7 +365,7 @@ export function CareerAtlasView() {
                 variant="primary"
                 size="md"
               >
-                Find Opportunities in this Role →
+                View opportunity examples →
               </Button>
             </div>
           </div>

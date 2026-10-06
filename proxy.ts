@@ -25,4 +25,4 @@ export async function proxy(request: NextRequest) {
   response.headers.set("Referrer-Policy", "no-referrer");
   return response;
 }
-export const config = { matcher: ["/icon.png", "/dashboard/:path*", "/admin/:path*", "/disputes/:path*", "/j/:path*", "/login", "/signup", "/auth/:path*", "/api/evidence/:path*"] };
+export const config = { matcher: ["/icon.png", "/account/:path*", "/dashboard/:path*", "/admin/:path*", "/disputes/:path*", "/j/:path*", "/login", "/signup", "/forgot-password", "/reset-password", "/auth/:path*", "/api/evidence/:path*"] };

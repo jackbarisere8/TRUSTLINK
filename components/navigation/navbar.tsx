@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
+  { href: "/providers",      label: "Find a provider" },
   { href: "/how-it-works",   label: "How it works" },
   { href: "/for-providers",  label: "For providers" },
   { href: "/for-businesses", label: "For businesses" },
-  { href: "/explore",        label: "Explore" },
 ];
 
 interface NavbarProps {
@@ -92,7 +92,7 @@ export function Navbar({ variant = "light", className }: NavbarProps) {
             size="sm"
             className="text-xs px-4"
           >
-            Create a TrustLink
+            Create account
           </Button>
         </div>
 
@@ -104,7 +104,7 @@ export function Navbar({ variant = "light", className }: NavbarProps) {
             size="sm"
             className="text-xs px-3"
           >
-            Start
+            Sign up
           </Button>
           <button
             ref={toggleRef}
@@ -185,7 +185,7 @@ export function Navbar({ variant = "light", className }: NavbarProps) {
               fullWidth
               onClick={() => setMobileMenuOpen(false)}
             >
-              Create your first TrustLink →
+              Create account →
             </Button>
           </div>
         </div>

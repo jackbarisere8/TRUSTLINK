@@ -9,34 +9,6 @@ export type CareerCategory =
 
 export type TrendStatus = "Emerging" | "Established" | "Evolving";
 
-export type TrendCategory =
-  | "CURRENT_OPPORTUNITY_DEMAND"
-  | "EMERGING_SKILL_SIGNAL"
-  | "REGULATORY_INFRASTRUCTURE_PUSH";
-
-export interface TrendSignal {
-  id: string;
-  signalType: TrendCategory;
-  title: string;
-  description: string;
-  sourceName: string;
-  sourceUrl?: string;
-  sourceDate: string;
-  observedAt: string;
-  geography: string;
-  confidence: "HIGH" | "MEDIUM" | "EMERGING";
-  slug: string;
-}
-
-export interface CareerTrendSignal {
-  summary: string;
-  source: string;
-  date: string;
-  signalType?: TrendCategory;
-  geography?: string;
-  confidence?: "HIGH" | "MEDIUM" | "EMERGING";
-}
-
 export interface Career {
   id: string;
   slug: string;
@@ -53,11 +25,8 @@ export interface Career {
     typicalDuration: string;
   }[];
   toolsRequired: string[];
-  typicalEmployers: string[];
   relatedCareers: string[];
-  typicalIncomeRange: string;
   trendStatus: TrendStatus;
-  trendSignal: CareerTrendSignal;
   suitableForMinors: boolean;
 }
 
@@ -115,25 +84,13 @@ export const CAREER_TAXONOMY: Career[] = [
       "Console Cable (USB to RJ45)",
       "Screwdriver set & punchdown tool",
     ],
-    typicalEmployers: [
-      "Internet Service Providers (Spectranet, Smile, FibreOne, ipNX)",
-      "Commercial Banks & Fintech Offices",
-      "Independent IT Support Contractors",
-      "Educational Institutions & Hospitals",
-    ],
     relatedCareers: [
       "Network Engineer",
       "Systems Administrator",
       "Cybersecurity Analyst",
       "Fiber Optic Splicer",
     ],
-    typicalIncomeRange: "₦120,000 – ₦450,000 / month",
     trendStatus: "Established",
-    trendSignal: {
-      summary: "Broadband expansion across major Nigerian commercial hubs sustains continuous demand for field deployment technicians.",
-      source: "Nigerian Communications Commission / Industry Reports",
-      date: "Q1 2026",
-    },
     suitableForMinors: true,
   },
   {
@@ -187,25 +144,13 @@ export const CAREER_TAXONOMY: Career[] = [
       "Screen recording tool (Loom) for walkthroughs",
       "Pen & Paper for rapid sketching",
     ],
-    typicalEmployers: [
-      "Fintech startups & product studios (Lagos, remote)",
-      "Digital agencies & software houses",
-      "Independent freelance practice via TrustLink",
-      "Foreign remote teams",
-    ],
     relatedCareers: [
       "Product Manager",
       "Frontend Developer",
       "Brand Designer",
       "Design Systems Lead",
     ],
-    typicalIncomeRange: "₦180,000 – ₦750,000+ / month",
     trendStatus: "Evolving",
-    trendSignal: {
-      summary: "AI prototyping tools are speeding up asset production, shifting designer value toward user insight and system architecture.",
-      source: "TechCabal African Tech Talent Survey",
-      date: "2026",
-    },
     suitableForMinors: true,
   },
   {
@@ -259,25 +204,13 @@ export const CAREER_TAXONOMY: Career[] = [
       "Git & GitHub account",
       "Reliable internet connection",
     ],
-    typicalEmployers: [
-      "Nigerian banks and fintechs (Interswitch, Paystack, Flutterwave, Moniepoint)",
-      "E-commerce, logistics, and healthcare companies",
-      "Independent contractors and tech consultancies",
-      "Global remote companies",
-    ],
     relatedCareers: [
       "DevOps / Cloud Engineer",
       "Data Engineer",
       "Cybersecurity Engineer",
       "Technical Product Lead",
     ],
-    typicalIncomeRange: "₦250,000 – ₦1,500,000+ / month",
     trendStatus: "Evolving",
-    trendSignal: {
-      summary: "Editorial observation: backend engineering and developer tools are possible areas to explore. This pilot has no validated demand estimate.",
-      source: "NISER Labour Market Analysis",
-      date: "Q1 2026",
-    },
     suitableForMinors: true,
   },
 
@@ -289,7 +222,7 @@ export const CAREER_TAXONOMY: Career[] = [
     category: "Engineering & Energy",
     tagline: "Design, size, install, and service renewable solar and inverter power systems.",
     description:
-      "With Nigeria's persistent grid power constraints and rising fuel costs, Solar Technicians represent one of the fastest-growing technical trades in the country. They calculate electrical load requirements, install photovoltaic panels, wire hybrid inverters, and configure lithium battery banks for residential and commercial clients.",
+      "Solar and inverter technicians calculate electrical loads, install photovoltaic panels, wire inverters, and configure battery systems. This editorial description does not measure current demand or certify any training route.",
     workdayTasks: [
       "Conducting load audits to determine power consumption of homes and businesses",
       "Mounting solar panels securely on rooftops with proper tilt and waterproofing",
@@ -317,8 +250,8 @@ export const CAREER_TAXONOMY: Career[] = [
         typicalDuration: "6–12 months",
       },
       {
-        title: "FME TVET / Technical College Training",
-        description: "Accredited technical course in Renewable Energy / Solar Installation.",
+        title: "Technical college or vocational training",
+        description: "Research current renewable-energy or solar-installation courses and verify accreditation directly with the relevant authority.",
         typicalDuration: "3–6 months",
       },
       {
@@ -334,25 +267,13 @@ export const CAREER_TAXONOMY: Career[] = [
       "Cordless Hammer Drill with masonry & metal bits",
       "Full Body Safety Harness for roof installations",
     ],
-    typicalEmployers: [
-      "Commercial Solar EPC Firms (Renewsys, Starsight, Daystar, Arnergy)",
-      "Telecom Tower Operators & Infrastructure Maintenance Firms",
-      "Self-Employed Solar Contractors with TrustLink Agreements",
-      "Estate Facilities Management Companies",
-    ],
     relatedCareers: [
       "Electrical Installation Specialist",
       "Energy Storage Engineer",
       "Facilities Maintenance Manager",
       "High-Voltage Substation Technician",
     ],
-    typicalIncomeRange: "₦150,000 – ₦800,000+ / project / month",
     trendStatus: "Emerging",
-    trendSignal: {
-      summary: "Removal of fuel subsidies and grid unreliability have triggered unprecedented national adoption of decentralized solar systems.",
-      source: "Rural Electrification Agency (REA) / NISER 2026",
-      date: "Q1 2026",
-    },
     suitableForMinors: false, // Involves high-voltage wiring and working at heights
   },
   {
@@ -390,8 +311,8 @@ export const CAREER_TAXONOMY: Career[] = [
         typicalDuration: "1–2 years",
       },
       {
-        title: "FME TVET & Technical College Certificate",
-        description: "National Technical Certificate (NTC) in Electrical Installation from NABTEB.",
+        title: "Technical college certificate route",
+        description: "Research current electrical-installation programmes and independently verify their awarding body and accreditation.",
         typicalDuration: "1–3 years",
       },
     ],
@@ -401,24 +322,12 @@ export const CAREER_TAXONOMY: Career[] = [
       "Conduit bender and fish tape / wire puller",
       "Chasing machine or hammer & cold chisel",
     ],
-    typicalEmployers: [
-      "Building Construction Contractors & Developers",
-      "Estate Facilities Management Teams",
-      "Independent Licensed Electrician Practice with TrustLink",
-      "Manufacturing Plants & Hotels",
-    ],
     relatedCareers: [
       "Solar & Inverter Technician",
       "Industrial Automation Technician",
       "Building Services Engineer",
     ],
-    typicalIncomeRange: "₦120,000 – ₦600,000 / month",
     trendStatus: "Established",
-    trendSignal: {
-      summary: "Steady urban construction across Lagos, Abuja, Ibadan, Port Harcourt, and Kano maintains consistent baseline demand.",
-      source: "Federal Ministry of Works / Construction Labour Index",
-      date: "2026",
-    },
     suitableForMinors: false,
   },
   {
@@ -428,7 +337,7 @@ export const CAREER_TAXONOMY: Career[] = [
     category: "Skilled Trades",
     tagline: "Diagnose and repair electronic control units, sensors, and mechanical systems in modern vehicles.",
     description:
-      "Automotive Diagnostics Technicians represent the modern evolution of vehicle repair in Nigeria. Moving far beyond traditional guesswork, they connect OBD-II diagnostic scanners to interrogate Electronic Control Modules (ECMs), test sensor waveforms, diagnose transmission control faults, and troubleshoot hybrid battery packs.",
+      "Automotive diagnostics technicians use OBD-II scanners, electrical measurements, service information, and mechanical inspection to investigate faults in modern vehicles.",
     workdayTasks: [
       "Connecting diagnostic scan tools to vehicle OBD ports to retrieve diagnostic trouble codes (DTCs)",
       "Interpreting live sensor data streams (O2 sensors, MAF, fuel trims) with oscilloscopes",
@@ -457,7 +366,7 @@ export const CAREER_TAXONOMY: Career[] = [
       },
       {
         title: "Technical Institute Mechatronics Diploma",
-        description: "Diploma in Automotive Mechatronics from accredited technical colleges.",
+        description: "Research automotive-mechatronics programmes and independently verify the provider, curriculum, and accreditation.",
         typicalDuration: "1–2 years",
       },
     ],
@@ -467,23 +376,12 @@ export const CAREER_TAXONOMY: Career[] = [
       "Automotive 2-channel Oscilloscope",
       "Insulated socket and ratchet tool chest",
     ],
-    typicalEmployers: [
-      "Modern Automotive Service Centers & Dealerships",
-      "Fleet Management & Logistics Companies (GIG, Sendbox, Uber fleets)",
-      "Independent Mobile Auto Diagnostics Contractors",
-    ],
     relatedCareers: [
       "EV & Hybrid Vehicle Technician",
       "Diesel Fuel Injection Specialist",
       "Heavy Duty Plant Mechanic",
     ],
-    typicalIncomeRange: "₦150,000 – ₦700,000+ / month",
     trendStatus: "Evolving",
-    trendSignal: {
-      summary: "The shift of the Nigerian vehicle fleet to computerized and hybrid vehicles has made traditional mechanics obsolete without electronic diagnostic skills.",
-      source: "Nigerian Automotive Industry Development Plan",
-      date: "2026",
-    },
     suitableForMinors: false,
   },
   {
@@ -532,24 +430,13 @@ export const CAREER_TAXONOMY: Career[] = [
       "Heavy-duty Steam Press Iron",
       "Pattern drafting rulers (French curve, hip curve, L-square) & shears",
     ],
-    typicalEmployers: [
-      "Bespoke Fashion Houses & Ateliers (Lagos, Abuja, Port Harcourt, Ibadan)",
-      "Garment Manufacturing & Ready-to-Wear Brands",
-      "Independent Designer Practice with TrustLink Agreements",
-    ],
     relatedCareers: [
       "Costume Designer",
       "Textile Designer",
       "Fashion Brand Manager",
       "Pattern Maker",
     ],
-    typicalIncomeRange: "₦150,000 – ₦1,000,000+ / month",
     trendStatus: "Established",
-    trendSignal: {
-      summary: "Vibrant Nigerian ceremonial culture and expanding exports of African apparel sustain consistent demand for high-craft bespoke garment makers.",
-      source: "Bank of Industry Creative Sector Report",
-      date: "2026",
-    },
     suitableForMinors: true,
   },
   {
@@ -603,24 +490,12 @@ export const CAREER_TAXONOMY: Career[] = [
       "Vulnerability Scanners (OpenVAS, Nmap)",
       "Terminal & Scripting environment (Bash / Python)",
     ],
-    typicalEmployers: [
-      "Commercial Banks & Payment Switches",
-      "Telecommunications Firms",
-      "Managed Security Service Providers (MSSPs)",
-      "Government & Defense Agencies",
-    ],
     relatedCareers: [
       "Penetration Tester / Ethical Hacker",
       "Security Operations Center (SOC) Manager",
       "Information Security Auditor",
     ],
-    typicalIncomeRange: "₦300,000 – ₦1,800,000+ / month",
     trendStatus: "Emerging",
-    trendSignal: {
-      summary: "Editorial observation: digital services use information-security skills. This pilot does not measure demand or confirm professional certification.",
-      source: "Nigeria Data Protection Commission (NDPC) Annual Report",
-      date: "2026",
-    },
     suitableForMinors: true,
   },
 ];
